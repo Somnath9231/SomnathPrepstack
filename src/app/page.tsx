@@ -1,7 +1,9 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { GlowButton } from "@/components/GlowButton";
-import { BookOpen, Code2, GraduationCap, Laptop, Layout, FileText, ArrowRight, Zap, Target } from "lucide-react";
+import { Code2, Laptop, Layout, ArrowRight, Zap, Target } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { cn } from "@/lib/utils";
 
@@ -29,19 +31,22 @@ const features = [
   }
 ];
 
+const companies = [
+  "Google", "Microsoft", "Amazon", "Meta", "Netflix", 
+  "Apple", "Uber", "Airbnb", "Adobe", "TCS", "Infosys", "Wipro"
+];
+
 export default function Home() {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-bg');
 
   return (
-    <div className="flex flex-col gap-32 pb-32">
+    <div className="flex flex-col gap-24 pb-32">
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
-        {/* 3D Floating Objects Background */}
         <div className="absolute inset-0 pointer-events-none -z-10">
           <div className="absolute top-[15%] left-[10%] w-72 h-72 bg-primary/20 rounded-3xl blur-[80px] animate-float-3d" />
           <div className="absolute bottom-[20%] right-[15%] w-96 h-96 bg-secondary/15 rounded-full blur-[100px] animate-float-3d [animation-delay:2s]" />
           
-          {/* Floating Geometric Shapes (CSS) */}
           <div className="absolute top-[40%] right-[20%] w-24 h-24 border-2 border-primary/30 rounded-lg animate-float-3d [animation-delay:1s] rotate-45" />
           <div className="absolute top-[25%] left-[25%] w-16 h-16 border-2 border-secondary/30 rounded-full animate-float-3d [animation-delay:4s]" />
           <div className="absolute bottom-[30%] left-[30%] w-32 h-32 border border-primary/20 animate-float-3d [animation-delay:3s] skew-x-12" />
@@ -91,7 +96,7 @@ export default function Home() {
                     <Target className="w-6 h-6 text-primary" />
                     <span className="text-lg font-black text-primary uppercase">Mission Protocol</span>
                   </div>
-                  <p className="text-sm font-bold text-white/80">Analyzing current industry benchmarks... Optimized path generated for FAANG roles.</p>
+                  <p className="text-sm font-bold text-white/80">Analyzing current industry benchmarks... Optimized path generated for top-tier roles.</p>
                 </div>
               </div>
             </div>
@@ -99,8 +104,27 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Companies Marquee */}
+      <section className="w-full overflow-hidden border-y border-white/5 py-12 bg-white/[0.02]">
+        <div className="max-w-7xl mx-auto px-4 mb-8">
+          <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.4em] text-center">Cracked by our students at</p>
+        </div>
+        <div className="relative flex">
+          <div className="animate-marquee whitespace-nowrap flex items-center gap-24">
+            {[...companies, ...companies].map((company, i) => (
+              <span 
+                key={i} 
+                className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-white/10 hover:text-primary transition-colors cursor-default hover:drop-shadow-[0_0_15px_rgba(0,245,255,0.8)]"
+              >
+                {company}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Feature Grid */}
-      <section className="max-w-7xl mx-auto px-4 w-full space-y-20">
+      <section className="max-w-7xl mx-auto px-4 w-full space-y-20 py-24">
         <div className="text-center space-y-6">
           <h2 className="text-5xl font-black uppercase tracking-tighter">Handcrafted <span className="text-neon-cyan">Core</span></h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Every module is built with precision to ensure you're not just practicing, but mastering.</p>
