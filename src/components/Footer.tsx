@@ -1,7 +1,16 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Github, Twitter, Linkedin, Mail, ShieldAlert, Award } from "lucide-react";
+import { Github, Twitter, Linkedin, Mail, ShieldAlert } from "lucide-react";
 
 export function Footer() {
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
+
   return (
     <footer className="bg-card border-t border-white/5 pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,7 +66,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-white/5 pt-12 text-center text-sm font-black text-muted-foreground uppercase tracking-[0.3em]">
-          <p>© {new Date().getFullYear()} PREPSTACK. Developed by Somnath Poddar.</p>
+          <p>© {year || '...'} PREPSTACK. Developed by Somnath Poddar.</p>
         </div>
       </div>
     </footer>
