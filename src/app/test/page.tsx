@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { GlowButton } from "@/components/GlowButton";
 import { Progress } from "@/components/ui/progress";
-import { Brain, Clock, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { Brain, Clock, ChevronLeft, ChevronRight, CheckCircle2, AlertCircle, ShieldCheck } from "lucide-react";
 
 const domains = ["Quantitative Aptitude", "Logical Reasoning", "Verbal Ability", "Data Interpretation", "Programming"];
 
@@ -25,7 +25,7 @@ export default function TestPage() {
     if (step === "test" && timeLeft > 0) {
       const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
       return () => clearInterval(timer);
-    } else if (timeLeft === 0) {
+    } else if (step === "test" && timeLeft === 0) {
       setStep("result");
     }
   }, [step, timeLeft]);
@@ -37,6 +37,7 @@ export default function TestPage() {
   };
 
   const handleOptionSelect = (idx: number) => {
+    if (timeLeft === 0) return;
     setAnswers({ ...answers, [currentQuestion]: idx });
   };
 
@@ -54,22 +55,22 @@ export default function TestPage() {
 
   if (step === "domain") {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-24 space-y-12">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Select Test Domain</h1>
-          <p className="text-muted-foreground">Pick a subject to start your 20-minute simulated placement test.</p>
+      <div className="max-w-5xl mx-auto px-4 py-24 space-y-16">
+        <div className="text-center space-y-6">
+          <h1 className="text-6xl font-black uppercase tracking-tighter">EXAM <span className="text-neon-cyan">MODE</span></h1>
+          <p className="text-xl text-muted-foreground font-medium">Select your specialization for the 20-minute industrial simulation.</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {domains.map((domain, i) => (
             <button
               key={i}
               onClick={() => { setCurrentDomain(domain); setStep("test"); }}
-              className="glass-card p-8 rounded-2xl text-center hover:border-primary/50 hover:bg-primary/5 transition-all group"
+              className="glass-card p-10 rounded-[2.5rem] text-center hover:neon-border-cyan transition-all duration-500 group"
             >
-              <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-all">
-                <Brain className="w-6 h-6 text-primary" />
+              <div className="w-16 h-16 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all border border-white/5">
+                <Brain className="w-8 h-8 text-primary" />
               </div>
-              <h3 className="font-bold">{domain}</h3>
+              <h3 className="text-2xl font-black uppercase tracking-tight">{domain}</h3>
             </button>
           ))}
         </div>
@@ -80,37 +81,41 @@ export default function TestPage() {
   if (step === "test") {
     const progress = ((currentQuestion + 1) / mockQuestions.length) * 100;
     return (
-      <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
-        <div className="flex items-center justify-between glass p-6 rounded-2xl border-white/10">
-          <div className="space-y-1">
-            <h2 className="font-bold text-lg">{currentDomain}</h2>
-            <div className="text-xs text-muted-foreground">Question {currentQuestion + 1} of {mockQuestions.length}</div>
+      <div className="max-w-4xl mx-auto px-4 py-20 space-y-10">
+        <div className="flex items-center justify-between glass p-8 rounded-[2rem] border-white/5 shadow-2xl">
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black uppercase tracking-tighter text-primary">{currentDomain}</h2>
+            <div className="text-xs font-black text-muted-foreground uppercase tracking-widest">Question {currentQuestion + 1} OF {mockQuestions.length}</div>
           </div>
-          <div className="flex items-center gap-3 glass px-4 py-2 rounded-xl text-primary font-mono text-xl font-bold neon-glow-blue">
-            <Clock className="w-5 h-5" />
+          <div className="flex items-center gap-4 glass px-6 py-3 rounded-2xl text-secondary font-mono text-3xl font-black neon-glow-pink">
+            <Clock className="w-6 h-6" />
             {formatTime(timeLeft)}
           </div>
         </div>
 
-        <Progress value={progress} className="h-2" />
+        <Progress value={progress} className="h-3 bg-white/5" />
 
-        <div className="glass-card p-10 rounded-3xl space-y-8 min-h-[400px]">
-          <h3 className="text-2xl font-medium leading-relaxed">
+        <div className="glass-card p-12 rounded-[3rem] space-y-10 min-h-[450px] relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-8 opacity-5">
+            <ShieldCheck className="w-32 h-32 text-primary" />
+          </div>
+          <h3 className="text-3xl font-black leading-tight uppercase tracking-tight">
             {mockQuestions[currentQuestion].q}
           </h3>
-          <div className="grid gap-4">
+          <div className="grid gap-5">
             {mockQuestions[currentQuestion].options.map((opt, i) => (
               <button
                 key={i}
+                disabled={timeLeft === 0}
                 onClick={() => handleOptionSelect(i)}
-                className={`w-full p-5 rounded-2xl text-left border transition-all ${
+                className={`w-full p-6 rounded-[1.5rem] text-left border-2 transition-all font-bold text-lg ${
                   answers[currentQuestion] === i 
                   ? "bg-primary/10 border-primary text-primary" 
                   : "bg-white/5 border-white/5 hover:border-white/20"
                 }`}
               >
-                <div className="flex items-center gap-4">
-                   <div className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold ${
+                <div className="flex items-center gap-6">
+                   <div className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center font-black ${
                      answers[currentQuestion] === i ? "border-primary bg-primary text-black" : "border-white/20"
                    }`}>
                      {String.fromCharCode(65 + i)}
@@ -122,20 +127,21 @@ export default function TestPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between pt-4">
+        <div className="flex items-center justify-between">
           <GlowButton 
             variant="outline" 
             disabled={currentQuestion === 0}
             onClick={() => setCurrentQuestion(prev => prev - 1)}
+            className="px-10 py-7"
           >
-            <ChevronLeft className="w-4 h-4 mr-2" /> Previous
+            <ChevronLeft className="w-5 h-5 mr-2" /> Back
           </GlowButton>
           
           {currentQuestion === mockQuestions.length - 1 ? (
-            <GlowButton onClick={() => setStep("result")}>Submit Test</GlowButton>
+            <GlowButton onClick={() => setStep("result")} variant="secondary" className="px-10 py-7">Finish Exam</GlowButton>
           ) : (
-            <GlowButton onClick={() => setCurrentQuestion(prev => prev + 1)}>
-              Next <ChevronRight className="w-4 h-4 ml-2" />
+            <GlowButton onClick={() => setCurrentQuestion(prev => prev + 1)} className="px-10 py-7">
+              Forward <ChevronRight className="w-5 h-5 ml-2" />
             </GlowButton>
           )}
         </div>
@@ -145,39 +151,34 @@ export default function TestPage() {
 
   const results = calculateResults();
   return (
-    <div className="max-w-4xl mx-auto px-4 py-24 space-y-12">
-      <div className="glass-card p-12 rounded-3xl text-center space-y-8 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-primary/10 blur-[100px]" />
+    <div className="max-w-4xl mx-auto px-4 py-24">
+      <div className="glass-card p-16 rounded-[4rem] text-center space-y-12 relative overflow-hidden">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 blur-[120px]" />
         
-        <div className="space-y-4">
-          <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary mb-4">
-            <CheckCircle2 className="w-12 h-12" />
+        <div className="space-y-6">
+          <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary mb-6">
+            <CheckCircle2 className="w-14 h-14" />
           </div>
-          <h2 className="text-5xl font-bold font-headline">Test <span className="text-neon-blue">Complete</span></h2>
-          <p className="text-muted-foreground text-xl">Great effort! Here is how you performed.</p>
+          <h2 className="text-7xl font-black uppercase tracking-tighter">EXAM <span className="text-neon-cyan">OVER</span></h2>
+          <p className="text-2xl text-muted-foreground font-medium">Protocol complete. Performance data captured.</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8">
-          <div className="space-y-1">
-            <div className="text-3xl font-bold">{results.score} / {mockQuestions.length}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Total Score</div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-3xl font-bold">{results.accuracy.toFixed(1)}%</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Accuracy</div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-3xl font-bold">{results.attempted}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Attempted</div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-3xl font-bold text-red-400">{mockQuestions.length - results.score}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-widest font-bold">Incorrect</div>
-          </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 pt-10">
+          {[
+            { label: "Score", value: `${results.score} / ${mockQuestions.length}` },
+            { label: "Accuracy", value: `${results.accuracy.toFixed(1)}%` },
+            { label: "Attempted", value: results.attempted },
+            { label: "Errors", value: mockQuestions.length - results.score },
+          ].map((item, idx) => (
+            <div key={idx} className="space-y-2">
+              <div className="text-4xl font-black tracking-tight">{item.value}</div>
+              <div className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em]">{item.label}</div>
+            </div>
+          ))}
         </div>
 
         <div className="pt-12">
-          <GlowButton size="lg" className="px-12" onClick={() => window.location.reload()}>Try Another Domain</GlowButton>
+          <GlowButton size="lg" className="px-16 py-8 text-xl" onClick={() => window.location.reload()}>Retake Challenge</GlowButton>
         </div>
       </div>
     </div>
