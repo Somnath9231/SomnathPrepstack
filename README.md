@@ -22,6 +22,40 @@
 - **Backend/Auth**: [Firebase](https://firebase.google.com/)
 - **AI**: [Genkit](https://github.com/firebase/genkit) for personalized resource and roadmap generation.
 
+## 🚀 How to Deploy to GitHub (Easy Guide)
+
+Follow these steps in your terminal to push this project to your GitHub repository:
+
+1. **Initialize Git**:
+   ```bash
+   git init
+   ```
+
+2. **Connect to your GitHub Repository**:
+   ```bash
+   git remote add origin https://github.com/Somnath9231/SomnathPrepstack.git
+   ```
+
+3. **Add all project files**:
+   ```bash
+   git add .
+   ```
+
+4. **Commit the changes**:
+   ```bash
+   git commit -m "Initial Launch of PrepStack Platform"
+   ```
+
+5. **Set branch to main**:
+   ```bash
+   git branch -M main
+   ```
+
+6. **Push to GitHub**:
+   ```bash
+   git push -u origin main
+   ```
+
 ## 📝 Platform Disclaimer
 
 PrepStack is a high-fidelity educational demonstration platform. This entire project—including the core concept, structure, and design—was originally conceived and architected by **Somnath Podder**. The code has been developed and optimized with the assistance of advanced AI technologies, including ChatGPT, Gemini, Firebase Studio, and more.
