@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -18,6 +17,7 @@ const navLinks = [
   { name: "Languages", href: "/languages" },
   { name: "Enroll", href: "/enroll" },
   { name: "Test", href: "/test" },
+  { name: "About", href: "/about" },
 ];
 
 export function Navbar() {
