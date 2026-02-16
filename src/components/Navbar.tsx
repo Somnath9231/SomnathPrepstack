@@ -4,19 +4,27 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { GlowButton } from "./GlowButton";
+import { useUser, useAuth } from "@/firebase";
+import { signOut } from "firebase/auth";
+import { LogIn, UserCircle, LogOut } from "lucide-react";
 
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Roadmaps", href: "/roadmaps" },
   { name: "Practice", href: "/practice" },
   { name: "Languages", href: "/languages" },
-  { name: "Resources", href: "/resources" },
+  { name: "Enroll", href: "/enroll" },
   { name: "Test", href: "/test" },
-  { name: "About", href: "/about" },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut(auth);
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
@@ -48,9 +56,26 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link href="/test">
-              <GlowButton size="lg" variant="secondary" className="hidden sm:inline-flex text-xs uppercase tracking-tighter">Enter Exam Room</GlowButton>
-            </Link>
+            {!isUserLoading && (
+              user ? (
+                <div className="flex items-center gap-4">
+                  <Link href="/dashboard">
+                    <GlowButton variant="outline" size="sm" className="hidden sm:inline-flex gap-2">
+                      <UserCircle className="w-4 h-4" /> Dashboard
+                    </GlowButton>
+                  </Link>
+                  <button onClick={handleSignOut} className="text-muted-foreground hover:text-secondary transition-colors p-2">
+                    <LogOut className="w-5 h-5" />
+                  </button>
+                </div>
+              ) : (
+                <Link href="/login">
+                  <GlowButton size="sm" variant="secondary" className="gap-2">
+                    <LogIn className="w-4 h-4" /> Sign In
+                  </GlowButton>
+                </Link>
+              )
+            )}
           </div>
         </div>
       </div>
