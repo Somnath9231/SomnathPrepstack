@@ -1,0 +1,904 @@
+{
+  "entities": {
+    "UserProfile": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserProfile",
+      "type": "object",
+      "description": "Represents a user registered with PrepStack, storing their profile information and current status.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserProfile entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address, used for login and communication.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "The display name of the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp indicating when the user profile was created.",
+          "format": "date-time"
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "description": "Timestamp indicating the user's last login.",
+          "format": "date-time"
+        },
+        "enrollmentStatus": {
+          "type": "string",
+          "description": "Indicates the user's current enrollment status (e.g., 'free', 'premium')."
+        },
+        "currentEnrollmentId": {
+          "type": "string",
+          "description": "Reference to the currently active UserEnrollment if the user is premium. (Relationship: UserProfile 1:1 UserEnrollment)"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "name",
+        "createdAt",
+        "lastLoginAt",
+        "enrollmentStatus"
+      ]
+    },
+    "EnrollmentProgram": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "EnrollmentProgram",
+      "type": "object",
+      "description": "Defines the details of a premium enrollment package offered by PrepStack.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the EnrollmentProgram entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the enrollment program (e.g., '6-Month Intensive Program')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the enrollment program."
+        },
+        "durationMonths": {
+          "type": "number",
+          "description": "The duration of the program in months."
+        },
+        "priceINR": {
+          "type": "number",
+          "description": "The price of the program in Indian Rupees (INR)."
+        },
+        "features": {
+          "type": "array",
+          "description": "A list of key features included in this program.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "durationMonths",
+        "priceINR",
+        "features"
+      ]
+    },
+    "UserEnrollment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserEnrollment",
+      "type": "object",
+      "description": "Records a specific user's enrollment in a premium program.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserEnrollment entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who enrolled. (Relationship: UserProfile 1:N UserEnrollment)"
+        },
+        "enrollmentProgramId": {
+          "type": "string",
+          "description": "Reference to the EnrollmentProgram the user enrolled in. (Relationship: EnrollmentProgram 1:N UserEnrollment)"
+        },
+        "enrollmentDate": {
+          "type": "string",
+          "description": "The date when the user enrolled.",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The date when the enrollment program is set to expire.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the enrollment (e.g., 'active', 'expired', 'pending')."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "enrollmentProgramId",
+        "enrollmentDate",
+        "endDate",
+        "status"
+      ]
+    },
+    "TestAttempt": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TestAttempt",
+      "type": "object",
+      "description": "Stores the results and metadata of a user's attempt at a test.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the TestAttempt entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile who attempted the test. (Relationship: UserProfile 1:N TestAttempt)"
+        },
+        "testDomain": {
+          "type": "string",
+          "description": "The domain or category of the test (e.g., 'Quantitative Aptitude', 'Data Structures')."
+        },
+        "score": {
+          "type": "number",
+          "description": "The total score obtained by the user in the test."
+        },
+        "totalQuestions": {
+          "type": "number",
+          "description": "The total number of questions in the test."
+        },
+        "correctAnswers": {
+          "type": "number",
+          "description": "The number of questions answered correctly."
+        },
+        "wrongAnswers": {
+          "type": "number",
+          "description": "The number of questions answered incorrectly."
+        },
+        "attemptPercentage": {
+          "type": "number",
+          "description": "The percentage of questions attempted by the user."
+        },
+        "accuracyPercentage": {
+          "type": "number",
+          "description": "The accuracy percentage of the user's answers."
+        },
+        "attemptDate": {
+          "type": "string",
+          "description": "Timestamp indicating when the test was attempted.",
+          "format": "date-time"
+        },
+        "durationTakenSeconds": {
+          "type": "number",
+          "description": "The duration (in seconds) the user took to complete the test."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "testDomain",
+        "score",
+        "totalQuestions",
+        "correctAnswers",
+        "wrongAnswers",
+        "attemptPercentage",
+        "accuracyPercentage",
+        "attemptDate",
+        "durationTakenSeconds"
+      ]
+    },
+    "Roadmap": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Roadmap",
+      "type": "object",
+      "description": "Defines a structured learning path or roadmap.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Roadmap entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the roadmap (e.g., 'B.Tech Placement Roadmap')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of what the roadmap covers."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the roadmap (e.g., 'Placement', 'Programming Starter')."
+        },
+        "order": {
+          "type": "number",
+          "description": "The display order of the roadmap within its category."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "category",
+        "order"
+      ]
+    },
+    "RoadmapTopic": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RoadmapTopic",
+      "type": "object",
+      "description": "Represents a specific topic or step within a Roadmap.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the RoadmapTopic entity."
+        },
+        "roadmapId": {
+          "type": "string",
+          "description": "Reference to the Roadmap this topic belongs to. (Relationship: Roadmap 1:N RoadmapTopic)"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the topic."
+        },
+        "description": {
+          "type": "string",
+          "description": "A short description of the topic's content."
+        },
+        "order": {
+          "type": "number",
+          "description": "The sequential order of this topic within its roadmap."
+        },
+        "resourceIds": {
+          "type": "array",
+          "description": "References to recommended Resource entities for this topic. (Relationship: Resource N:N RoadmapTopic)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "practiceTopicIds": {
+          "type": "array",
+          "description": "References to related PracticeTopic entities for this topic. (Relationship: PracticeTopic N:N RoadmapTopic)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "roadmapId",
+        "title",
+        "description",
+        "order"
+      ]
+    },
+    "UserRoadmapProgress": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserRoadmapProgress",
+      "type": "object",
+      "description": "Tracks a user's progress through a specific learning roadmap.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserRoadmapProgress entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the UserProfile. (Relationship: UserProfile 1:N UserRoadmapProgress)"
+        },
+        "roadmapId": {
+          "type": "string",
+          "description": "Reference to the Roadmap being tracked. (Relationship: Roadmap 1:N UserRoadmapProgress)"
+        },
+        "completedTopicIds": {
+          "type": "array",
+          "description": "An array of IDs of RoadmapTopic entities that the user has completed.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "lastAccessedDate": {
+          "type": "string",
+          "description": "Timestamp of when the user last accessed or made progress in this roadmap.",
+          "format": "date-time"
+        },
+        "completionPercentage": {
+          "type": "number",
+          "description": "The calculated completion percentage of the roadmap for the user."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "roadmapId",
+        "completedTopicIds",
+        "lastAccessedDate"
+      ]
+    },
+    "PracticeModule": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PracticeModule",
+      "type": "object",
+      "description": "Represents a high-level practice stream or category (e.g., 'Data Structures', 'Aptitude').",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PracticeModule entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the practice module (e.g., 'Data Structures', 'Aptitude')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of what this practice module covers."
+        },
+        "category": {
+          "type": "string",
+          "description": "The broader category this module belongs to (e.g., 'Tech Students', 'Common For All')."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "category"
+      ]
+    },
+    "PracticeTopic": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PracticeTopic",
+      "type": "object",
+      "description": "Represents a specific learning topic within a PracticeModule (e.g., 'Arrays' under 'Data Structures').",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PracticeTopic entity."
+        },
+        "practiceModuleId": {
+          "type": "string",
+          "description": "Reference to the PracticeModule this topic belongs to. (Relationship: PracticeModule 1:N PracticeTopic)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the practice topic (e.g., 'Arrays', 'Stack')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A short description of the topic."
+        },
+        "explanation": {
+          "type": "string",
+          "description": "Detailed explanation for the topic."
+        },
+        "codeExample": {
+          "type": "string",
+          "description": "An example code snippet illustrating the topic concept."
+        },
+        "exampleProblem": {
+          "type": "string",
+          "description": "A problem statement illustrating the application of the topic."
+        },
+        "questionIds": {
+          "type": "array",
+          "description": "References to related Question entities for practice. (Relationship: Question N:N PracticeTopic)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "practiceModuleId",
+        "name",
+        "description",
+        "explanation",
+        "codeExample",
+        "exampleProblem"
+      ]
+    },
+    "ProgrammingLanguageModule": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ProgrammingLanguageModule",
+      "type": "object",
+      "description": "Represents a learning module for a specific programming language.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ProgrammingLanguageModule entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the programming language (e.g., 'C++', 'Python')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief overview of the language module."
+        },
+        "sections": {
+          "type": "array",
+          "description": "Key learning sections within the language module (e.g., 'Basics', 'OOP').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "questionIds": {
+          "type": "array",
+          "description": "References to associated Question entities for practice and interviews. (Relationship: Question N:N ProgrammingLanguageModule)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "sections"
+      ]
+    },
+    "ResourceCategory": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ResourceCategory",
+      "type": "object",
+      "description": "Organizes resources into logical categories (e.g., 'Resume Templates', 'Cheat Sheets').",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ResourceCategory entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the resource category (e.g., 'Resume Templates')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the types of resources found in this category."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description"
+      ]
+    },
+    "Resource": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Resource",
+      "type": "object",
+      "description": "Represents an individual learning resource like a resume template or a cheat sheet.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Resource entity."
+        },
+        "resourceCategoryId": {
+          "type": "string",
+          "description": "Reference to the ResourceCategory this resource belongs to. (Relationship: ResourceCategory 1:N Resource)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the resource (e.g., 'Modern Tech Resume')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of the resource's content."
+        },
+        "fileUrl": {
+          "type": "string",
+          "description": "The URL where the resource file (e.g., PDF) can be accessed.",
+          "format": "uri"
+        },
+        "previewImageUrl": {
+          "type": "string",
+          "description": "The URL for an image preview of the resource.",
+          "format": "uri"
+        },
+        "isPremium": {
+          "type": "boolean",
+          "description": "Indicates if this resource is exclusive to premium users."
+        },
+        "fileSizeKB": {
+          "type": "number",
+          "description": "The size of the resource file in kilobytes."
+        }
+      },
+      "required": [
+        "id",
+        "resourceCategoryId",
+        "name",
+        "description",
+        "fileUrl",
+        "previewImageUrl",
+        "isPremium"
+      ]
+    },
+    "Question": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Question",
+      "type": "object",
+      "description": "Stores details about a single multiple-choice or practice question used across modules and tests.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Question entity."
+        },
+        "questionText": {
+          "type": "string",
+          "description": "The full text of the question."
+        },
+        "options": {
+          "type": "array",
+          "description": "An array of possible answer options for an MCQ.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "correctOptionIndex": {
+          "type": "number",
+          "description": "The zero-based index of the correct answer in the 'options' array."
+        },
+        "explanation": {
+          "type": "string",
+          "description": "A detailed explanation of the correct answer or solution."
+        },
+        "difficulty": {
+          "type": "string",
+          "description": "The difficulty level of the question (e.g., 'easy', 'medium', 'hard')."
+        },
+        "domain": {
+          "type": "string",
+          "description": "The primary domain or subject area of the question (e.g., 'Quantitative Aptitude', 'Data Structures')."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of question (e.g., 'MCQ', 'CodeSnippet', 'FillInTheBlanks')."
+        }
+      },
+      "required": [
+        "id",
+        "questionText",
+        "options",
+        "correctOptionIndex",
+        "explanation",
+        "difficulty",
+        "domain",
+        "type"
+      ]
+    },
+    "ContactSubmission": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ContactSubmission",
+      "type": "object",
+      "description": "Stores messages submitted through the website's contact form.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ContactSubmission entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the person submitting the form."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the person submitting the form.",
+          "format": "email"
+        },
+        "message": {
+          "type": "string",
+          "description": "The message content submitted by the user."
+        },
+        "submissionDate": {
+          "type": "string",
+          "description": "Timestamp indicating when the contact form was submitted.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "email",
+        "message",
+        "submissionDate"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "UserProfile",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "Stores user profile information, including current enrollment status. The 'userId' in the path ensures authorization independence as it matches 'request.auth.uid'. The 'enrollmentStatus' field is denormalized for quick access in security rules.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique Firebase Authentication UID of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/enrollment_programs/{programId}",
+        "definition": {
+          "entityName": "EnrollmentProgram",
+          "schema": {
+            "$ref": "#/backend/entities/EnrollmentProgram"
+          },
+          "description": "Defines the available premium enrollment packages. Publicly readable to display options; only administrators can create or update these programs.",
+          "params": [
+            {
+              "name": "programId",
+              "description": "The unique identifier for an enrollment program."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/enrollments/{enrollmentId}",
+        "definition": {
+          "entityName": "UserEnrollment",
+          "schema": {
+            "$ref": "#/backend/entities/UserEnrollment"
+          },
+          "description": "Records a specific user's subscription to a premium program. The 'userId' in the path ensures authorization independence, making it only accessible by the owner. Includes denormalized 'userId' in the path for authorization.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique Firebase Authentication UID of the user who enrolled."
+            },
+            {
+              "name": "enrollmentId",
+              "description": "The unique identifier for this specific user enrollment record."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/test_attempts/{testAttemptId}",
+        "definition": {
+          "entityName": "TestAttempt",
+          "schema": {
+            "$ref": "#/backend/entities/TestAttempt"
+          },
+          "description": "Stores the results and metadata of a user's test attempt. The 'userId' in the path ensures authorization independence, allowing only the owner to read/write their attempts. Includes denormalized 'userId' in the path for authorization.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique Firebase Authentication UID of the user who attempted the test."
+            },
+            {
+              "name": "testAttemptId",
+              "description": "The unique identifier for a specific test attempt."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roadmaps/{roadmapId}",
+        "definition": {
+          "entityName": "Roadmap",
+          "schema": {
+            "$ref": "#/backend/entities/Roadmap"
+          },
+          "description": "Defines structured learning paths accessible to all users. Publicly readable; only administrators can manage roadmaps.",
+          "params": [
+            {
+              "name": "roadmapId",
+              "description": "The unique identifier for a learning roadmap."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roadmaps/{roadmapId}/topics/{topicId}",
+        "definition": {
+          "entityName": "RoadmapTopic",
+          "schema": {
+            "$ref": "#/backend/entities/RoadmapTopic"
+          },
+          "description": "Represents individual topics or steps within a learning roadmap. Publicly readable; only administrators can manage these topics.",
+          "params": [
+            {
+              "name": "roadmapId",
+              "description": "The unique identifier of the parent roadmap."
+            },
+            {
+              "name": "topicId",
+              "description": "The unique identifier for a specific topic within a roadmap."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/roadmap_progress/{progressId}",
+        "definition": {
+          "entityName": "UserRoadmapProgress",
+          "schema": {
+            "$ref": "#/backend/entities/UserRoadmapProgress"
+          },
+          "description": "Tracks a specific user's completion progress through a global roadmap. The 'userId' in the path ensures authorization independence, allowing only the owner to manage their progress. Includes denormalized 'userId' in the path for authorization.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique Firebase Authentication UID of the user tracking progress."
+            },
+            {
+              "name": "progressId",
+              "description": "The unique identifier for a user's progress record on a specific roadmap."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/practice_modules/{moduleId}",
+        "definition": {
+          "entityName": "PracticeModule",
+          "schema": {
+            "$ref": "#/backend/entities/PracticeModule"
+          },
+          "description": "Defines high-level practice streams or categories accessible to all users. Publicly readable; only administrators can manage modules.",
+          "params": [
+            {
+              "name": "moduleId",
+              "description": "The unique identifier for a practice module."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/practice_modules/{moduleId}/topics/{topicId}",
+        "definition": {
+          "entityName": "PracticeTopic",
+          "schema": {
+            "$ref": "#/backend/entities/PracticeTopic"
+          },
+          "description": "Represents specific learning topics within a practice module. Publicly readable; only administrators can manage topics.",
+          "params": [
+            {
+              "name": "moduleId",
+              "description": "The unique identifier of the parent practice module."
+            },
+            {
+              "name": "topicId",
+              "description": "The unique identifier for a specific topic within a practice module."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/language_modules/{languageId}",
+        "definition": {
+          "entityName": "ProgrammingLanguageModule",
+          "schema": {
+            "$ref": "#/backend/entities/ProgrammingLanguageModule"
+          },
+          "description": "Defines learning modules for specific programming languages. Publicly readable; only administrators can manage modules.",
+          "params": [
+            {
+              "name": "languageId",
+              "description": "The unique identifier for a programming language module."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/resource_categories/{categoryId}",
+        "definition": {
+          "entityName": "ResourceCategory",
+          "schema": {
+            "$ref": "#/backend/entities/ResourceCategory"
+          },
+          "description": "Organizes learning resources into logical categories. Publicly readable; only administrators can manage categories.",
+          "params": [
+            {
+              "name": "categoryId",
+              "description": "The unique identifier for a resource category."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/resources_free/{resourceId}",
+        "definition": {
+          "entityName": "Resource",
+          "schema": {
+            "$ref": "#/backend/entities/Resource"
+          },
+          "description": "Individual learning resources accessible to all users (free tier). This collection ensures public read access without requiring complex role checks. Follows structural segregation for QAPs.",
+          "params": [
+            {
+              "name": "resourceId",
+              "description": "The unique identifier for a specific free resource."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/resources_premium/{resourceId}",
+        "definition": {
+          "entityName": "Resource",
+          "schema": {
+            "$ref": "#/backend/entities/Resource"
+          },
+          "description": "Individual learning resources exclusive to premium users. Access requires an active premium enrollment status, checked against the user's profile document (e.g., 'users/{uid}.enrollmentStatus'). Follows structural segregation for QAPs.",
+          "params": [
+            {
+              "name": "resourceId",
+              "description": "The unique identifier for a specific premium resource."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/questions/{questionId}",
+        "definition": {
+          "entityName": "Question",
+          "schema": {
+            "$ref": "#/backend/entities/Question"
+          },
+          "description": "Stores details about individual practice and test questions. Publicly readable; only administrators can manage questions.",
+          "params": [
+            {
+              "name": "questionId",
+              "description": "The unique identifier for a question."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/contact_submissions/{submissionId}",
+        "definition": {
+          "entityName": "ContactSubmission",
+          "schema": {
+            "$ref": "#/backend/entities/ContactSubmission"
+          },
+          "description": "Stores messages submitted through the website's contact form. Publicly writable (create); only administrators can read these submissions.",
+          "params": [
+            {
+              "name": "submissionId",
+              "description": "The unique identifier for a contact form submission."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{adminUid}",
+        "definition": {
+          "entityName": "AdminRole",
+          "schema": {
+            "$ref": "#/backend/entities/UserProfile"
+          },
+          "description": "A collection used for Database Access Control (DBAC) to identify administrative users. The existence of a document with a user's UID in this collection grants them an 'admin' role. Follows the 'existence over content' principle.",
+          "params": [
+            {
+              "name": "adminUid",
+              "description": "The unique Firebase Authentication UID of a user with administrative privileges."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for PrepStack is designed adhering strictly to the CORE DESIGN PRINCIPLES and DESIGN STRATEGY MANDATES to ensure a secure, scalable, and debuggable system, especially focusing on authorization independence and query-ability for different user tiers.\n\n**Authorization Independence (CRITICAL) & DBAC (No Custom Claims):**\n\n1.  **User-Specific Data:** All user-owned entities (`UserProfile`, `UserEnrollment`, `TestAttempt`, `UserRoadmapProgress`) are nested under `/users/{userId}`. This path-based ownership ensures that security rules can directly compare `request.auth.uid` with the `{userId}` wildcard in the path. This eliminates the need for `get()` calls to a parent document to determine ownership or permissions, making authorization checks atomic and highly efficient. For example, a rule for `/users/{userId}/enrollments/{enrollmentId}` only needs to check `allow read, write: if request.auth.uid == userId;`. The `UserProfile` document itself is `users/{userId}`, making it the authoritative source for the user's own `enrollmentStatus`, crucial for authorization decisions for global premium content.\n2.  **Global Content:** Entities like `Roadmap`, `PracticeModule`, `ProgrammingLanguageModule`, `ResourceCategory`, and `Question` are stored in top-level collections (e.g., `/roadmaps`, `/practice_modules`). Access to these is generally public or requires authentication but is not dependent on specific user roles stored in a parent document. The `RoadmapTopic` and `PracticeTopic` subcollections are nested under their respective parent global entities, but their authorization posture is the same as the parent (public read), thus not requiring `get()` calls for authorization logic.\n3.  **Admin Roles:** A dedicated collection, `/roles_admin/{adminUid}`, is used for DBAC (Database Access Control). The mere existence of a document at `/roles_admin/$(request.auth.uid)` grants administrative privileges, following the 'existence over content' principle and avoiding complex `get()` calls to check roles within a single document.\n\n**Structural Segregation (Homogeneous Security Posture) & QAPs (Rules are not Filters):**\n\n1.  **User Data Segregation:** All data specific to a user is segregated under their `users/{userId}` path, ensuring a homogeneous security posture (only the owner can read/write). This makes `list` operations implicitly secure as they only return data relevant to the authenticated user, directly supporting QAPs.\n2.  **Free vs. Premium Resources:** The `Resource` entity is segregated into two top-level collections: `/resources_free` and `/resources_premium`. This is a critical application of structural segregation.\n    *   `resources_free`: Contains resources accessible to all users. Its security rules are simple (`allow read: if true;` or `request.auth.uid != null;`). `list` operations here will return all free resources, fully compliant with QAP.\n    *   `resources_premium`: Contains resources exclusive to premium users. Its security rules will check the requesting user's `enrollmentStatus` (from their `UserProfile` document). While this requires a `get(/databases/$(database)/documents/users/$(request.auth.uid))` call, it is distinct from hierarchical authorization dependencies on a *parent document's data* and is a common, accepted pattern for checking the *actor's own privileges* against global content, especially when custom claims are disallowed. For `list` operations, a premium user can query `resources_premium` directly, and the rules will only allow access if their `enrollmentStatus` is 'premium'. This also directly supports QAP, as the client can confidently list all documents in `resources_premium` if authorized, without needing to filter out results at the client level.\n3.  **Contact Submissions:** `/contact_submissions` allows anonymous `create` for messages but restricts `read` access only to administrators (checking against `/roles_admin/{adminUid}`). This segregation ensures public submission while maintaining private administrative access, adhering to QAP for admin access.\n\n**Access Modeling & Data Clarity:**\n\n*   **Path-Based Ownership:** Consistently applied for user-specific data (`/users/{userId}/...`).\n*   **Standardized Naming:** Descriptive wildcards like `{userId}`, `{roadmapId}`, `{resourceId}` are used for clarity.\n*   **Explicit State:** `enrollmentStatus` in `UserProfile` provides clear, single-point status management, reducing ambiguity. This field is effectively a denormalization of the user's current `UserEnrollment` for quick authorization checks.\n\nThis structure prioritizes rule simplicity by moving authorization logic from complex `get()` calls on related data to predictable path-based ownership and clear structural segregation. The minimal `get()` calls are justified for checking the requesting user's own roles, which is a common and necessary pattern for freemium models without custom claims."
+  }
+}

@@ -1,0 +1,244 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * PREPSTACK SECURITY RULES (PROTOTYPING MODE)
+     *
+     * Core Philosophy: This ruleset enforces a strict user-ownership model for all student-specific data
+     * while providing public access to educational content. Administrative privileges are managed
+     * through a dedicated 'roles_admin' collection (Database Access Control).
+     *
+     * Data Structure: 
+     * - User-owned data is strictly nested under /users/{userId} to ensure path-based authorization.
+     * - Educational content (roadmaps, modules, questions) is stored in top-level collections.
+     * - Premium content is segregated into /resources_premium and requires active status verification.
+     *
+     * Key Security Decisions:
+     * - Authorization Independence: By using /users/{userId} as a root for all personal data, we
+     *   avoid costly get() calls to verify ownership.
+     * - Structural Segregation: Free and Premium resources are stored in separate collections
+     *   to simplify security logic and ensure efficient, secure listing.
+     * - Admin Access: Administrative rights are determined by the existence of a document in the
+     *   /roles_admin/{uid} collection.
+     *
+     * Denormalization for Authorization:
+     * - The 'enrollmentStatus' is denormalized directly onto the UserProfile document to facilitate
+     *   fast access checks for premium content.
+     */
+
+    // --- Helper Functions ---
+
+    /** @description Checks if the user is authenticated. */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /** @description Checks if the authenticated user matches the provided userId. */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /** @description Verifies the user is an owner and the document exists (for updates/deletes). */
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    /** @description Checks if the user has administrative privileges via the roles_admin collection. */
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+    }
+
+    /** @description Checks if the user has an active premium enrollment status. */
+    function isPremium() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.enrollmentStatus == 'premium';
+    }
+
+    // --- Collection Rules ---
+
+    /**
+     * @description Rules for the student's profile document.
+     * @path /users/{userId}
+     * @allow (get, list, create, update) if the authenticated UID matches the path userId.
+     * @deny (create) if the UID does not match the data ID.
+     * @principle Enforces path-based ownership and self-creation.
+     */
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Personal enrollment records for a specific student.
+     * @path /users/{userId}/enrollments/{enrollmentId}
+     * @allow (get, list, create) if the student owns the parent user path.
+     * @deny (update) if the student tries to change the record; enrollments are usually immutable for students.
+     * @principle Path-based ownership for subcollections.
+     */
+    match /users/{userId}/enrollments/{enrollmentId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Test result history for an individual student.
+     * @path /users/{userId}/test_attempts/{testAttemptId}
+     * @allow (get, list, create) if the student owns the parent user path.
+     * @deny (delete) if requested by the student (test history is permanent).
+     * @principle Ensures data integrity and student-only access to progress data.
+     */
+    match /users/{userId}/test_attempts/{testAttemptId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Tracking progress through specific learning roadmaps.
+     * @path /users/{userId}/roadmap_progress/{progressId}
+     * @allow (get, list, create, update) if the student owns the parent user path.
+     * @principle Standard student ownership of progress tracking.
+     */
+    match /users/{userId}/roadmap_progress/{progressId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Publicly available enrollment program details (pricing, features).
+     * @path /enrollment_programs/{programId}
+     * @allow (get, list) for any visitor.
+     * @deny (write) for any non-admin.
+     * @principle Public read-only access for marketing content.
+     */
+    match /enrollment_programs/{programId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Learning roadmaps and their hierarchical topics.
+     * @path /roadmaps/{roadmapId} and subcollections
+     * @allow (get, list) for any visitor.
+     * @principle Content access for all users; admin-only management.
+     */
+    match /roadmaps/{roadmapId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+
+      match /topics/{topicId} {
+        allow get, list: if true;
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    /**
+     * @description Practice modules and their contained learning topics.
+     * @path /practice_modules/{moduleId} and subcollections
+     * @allow (get, list) for any visitor.
+     * @principle Public access to practice materials.
+     */
+    match /practice_modules/{moduleId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+
+      match /topics/{topicId} {
+        allow get, list: if true;
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    /**
+     * @description Programming language-specific learning materials.
+     * @path /language_modules/{languageId}
+     * @allow (get, list) for all users.
+     */
+    match /language_modules/{languageId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Categories used to organize various resources.
+     * @path /resource_categories/{categoryId}
+     * @allow (get, list) for all users.
+     */
+    match /resource_categories/{categoryId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Educational resources available at no cost.
+     * @path /resources_free/{resourceId}
+     * @allow (get, list) for all users.
+     */
+    match /resources_free/{resourceId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Exclusive resources gated behind a premium enrollment.
+     * @path /resources_premium/{resourceId}
+     * @allow (get, list) only if the user has a 'premium' enrollment status.
+     * @deny (get, list) for free or unauthenticated users.
+     * @principle Gates premium content using a profile status check.
+     */
+    match /resources_premium/{resourceId} {
+      allow get, list: if isPremium() || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Repository of all practice and mock test questions.
+     * @path /questions/{questionId}
+     * @allow (get, list) for all users.
+     */
+    match /questions/{questionId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Collection for receiving public contact form messages.
+     * @path /contact_submissions/{submissionId}
+     * @allow (create) for anyone to submit a message.
+     * @deny (get, list) to anyone except administrators to protect privacy.
+     * @principle Public write, admin-only read.
+     */
+    match /contact_submissions/{submissionId} {
+      allow create: if true;
+      allow get, list, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Internal administrative role definitions.
+     * @path /roles_admin/{adminUid}
+     * @allow (get) for authenticated users to check their own role.
+     * @deny (list, write) for everyone; managed only via the Firebase Console.
+     * @principle DBAC via existence check.
+     */
+    match /roles_admin/{adminUid} {
+      allow get: if isSignedIn();
+      allow list, create, update, delete: if false;
+    }
+  }
+}
+
+/**
+ * DEVELOPMENT NOTES:
+ * 1. Prototyping Mode: Field types and object shapes are not enforced.
+ * 2. Immutability: Critical relational fields like 'userId' and 'id' are protected on update.
+ * 3. QAP Compliance: 'list' rules are carefully scoped to ensure queries return exactly what is authorized.
+ */
+
+/*
+End of PrepStack Security Rules.
+*/
