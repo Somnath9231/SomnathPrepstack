@@ -40,11 +40,11 @@ export default function AboutPage() {
             <div className="space-y-4">
               <h3 className="text-4xl font-bold">Founder's Story</h3>
               <p className="text-muted-foreground text-lg leading-relaxed">
-                Somnath Poddar built PrepStack as a personal initiative to solve a problem he witnessed firsthand: the disconnect between what colleges teach and what the industry actually looks for.
+                Somnath Podder built PrepStack as a personal initiative to solve a problem he witnessed firsthand: the disconnect between what colleges teach and what the industry actually looks for.
               </p>
             </div>
             <div className="space-y-4">
-              <div className="text-2xl font-bold text-primary">Somnath Poddar</div>
+              <div className="text-2xl font-bold text-primary">Somnath Podder</div>
               <div className="text-sm text-muted-foreground uppercase tracking-widest font-bold">Founder & Developer</div>
               <p className="text-muted-foreground">
                 With a background in software engineering and a passion for education, Somnath developed PrepStack to automate personalized guidance, making quality placement prep accessible to all.

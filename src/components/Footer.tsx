@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Github, Twitter, Linkedin, Mail, ShieldAlert } from "lucide-react";
+import { Linkedin, Mail, ShieldAlert } from "lucide-react";
 
 export function Footer() {
   const [year, setYear] = useState<number | null>(null);
@@ -23,11 +23,20 @@ export function Footer() {
               Industrial preparation reimagined. We build technical excellence through deep learning and real-time simulation protocols.
             </p>
             <div className="flex gap-6">
-              {[Github, Twitter, Linkedin, Mail].map((Icon, i) => (
-                <a key={i} href="#" className="p-3 glass rounded-2xl hover:text-primary transition-all hover:neon-glow-cyan">
-                  <Icon className="w-6 h-6" />
-                </a>
-              ))}
+              <a 
+                href="https://www.linkedin.com/in/somnath-podder-538192372/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-3 glass rounded-2xl hover:text-primary transition-all hover:neon-glow-cyan"
+              >
+                <Linkedin className="w-6 h-6" />
+              </a>
+              <a 
+                href="mailto:poddersomnath598@gmail.com" 
+                className="p-3 glass rounded-2xl hover:text-primary transition-all hover:neon-glow-cyan"
+              >
+                <Mail className="w-6 h-6" />
+              </a>
             </div>
           </div>
 
@@ -59,14 +68,14 @@ export function Footer() {
             <div className="space-y-3">
               <h5 className="text-lg font-black text-primary uppercase tracking-widest">Platform Disclaimer</h5>
               <p className="text-sm font-bold text-muted-foreground leading-relaxed">
-                PrepStack is a high-fidelity educational demonstration platform. Statistics, industrial benchmarks, and company simulations are curated for learning purposes. Built as a flagship portfolio project for modern EdTech ecosystems.
+                PrepStack is an educational demonstration platform. This entire project, including the core concept, structure, and design, was originally conceived and thought by <strong>Somnath Podder</strong>. The code for this platform has been meticulously developed and optimized with the assistance of advanced AI technologies, including ChatGPT, Gemini, Firebase Studio, and more. Built as a flagship portfolio project for modern EdTech ecosystems.
               </p>
             </div>
           </div>
         </div>
 
         <div className="border-t border-white/5 pt-12 text-center text-sm font-black text-muted-foreground uppercase tracking-[0.3em]">
-          <p>© {year || '...'} PREPSTACK. Developed by Somnath Poddar.</p>
+          <p>© {year || '...'} PREPSTACK. Developed by Somnath Podder.</p>
         </div>
       </div>
     </footer>
