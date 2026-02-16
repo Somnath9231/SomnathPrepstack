@@ -68,7 +68,7 @@ export function Footer() {
             <div className="space-y-3">
               <h5 className="text-lg font-black text-primary uppercase tracking-widest">Platform Disclaimer</h5>
               <p className="text-sm font-bold text-muted-foreground leading-relaxed">
-                PrepStack is an educational demonstration platform. This entire project, including the core concept, structure, and design, was originally conceived and thought by <strong>Somnath Podder</strong>. The code for this platform has been meticulously developed and optimized with the assistance of advanced AI technologies, including ChatGPT, Gemini, Firebase Studio, and more. Built as a flagship portfolio project for modern EdTech ecosystems.
+                PrepStack is a high-fidelity educational demonstration platform. This entire project, including the core concept, structure, and design, was originally conceived and architected by <strong>Somnath Podder</strong>. The code for this platform has been developed and optimized with the assistance of advanced AI technologies, including ChatGPT, Gemini, Firebase Studio, and more. Built as a flagship portfolio project for modern EdTech ecosystems.
               </p>
             </div>
           </div>
