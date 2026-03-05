@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,7 +20,7 @@ export function Footer() {
             <Link href="/" className="text-4xl font-black tracking-tighter text-neon-cyan group inline-block">
               PREPSTACK
             </Link>
-            <p className="text-muted-foreground text-lg max-sm font-medium leading-relaxed">
+            <p className="text-muted-foreground text-lg max-w-sm font-medium leading-relaxed">
               Industrial preparation reimagined. We build technical excellence through deep learning and real-time simulation protocols.
             </p>
             <div className="flex gap-6">
@@ -61,7 +62,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Development Disclaimer */}
         <div className="glass rounded-[2rem] p-10 mb-12 border-primary/10 bg-primary/[0.02]">
           <div className="flex items-start gap-6">
             <ShieldAlert className="w-10 h-10 text-primary shrink-0" />
@@ -75,7 +75,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-white/5 pt-12 text-center text-sm font-black text-muted-foreground uppercase tracking-[0.3em]">
-          <p>© {year || '2026'} PREPSTACK. Developed by Somnath Podder.</p>
+          <p>© {year || '2025'} PREPSTACK. Developed by Somnath Podder.</p>
         </div>
       </div>
     </footer>

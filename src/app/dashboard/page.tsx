@@ -1,8 +1,9 @@
+
 "use client";
 
-import { useUser, useFirestore, useCollection, useMemoFirebase } from "@/firebase";
+import { useUser, useFirestore, useCollection, useDoc, useMemoFirebase } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { GlowButton } from "@/components/GlowButton";
 import { 
   Trophy, 
@@ -13,10 +14,12 @@ import {
   LineChart,
   ChevronRight,
   ShieldCheck,
-  Loader2
+  Loader2,
+  Calendar
 } from "lucide-react";
 import Link from "next/link";
-import { collection, orderBy, query, limit } from "firebase/firestore";
+import { collection, orderBy, query, limit, doc } from "firebase/firestore";
+import { Progress } from "@/components/ui/progress";
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -28,6 +31,9 @@ export default function DashboardPage() {
       router.push("/login");
     }
   }, [user, isUserLoading, router]);
+
+  const userDocRef = useMemoFirebase(() => user ? doc(db, "users", user.uid) : null, [user, db]);
+  const { data: userData } = useDoc(userDocRef);
 
   const attemptsQuery = useMemoFirebase(() => {
     if (!user || !db) return null;
@@ -48,12 +54,16 @@ export default function DashboardPage() {
     );
   }
 
-  const stats = [
-    { label: "Tests Taken", value: testAttempts?.length.toString() || "0", icon: <Trophy />, color: "text-primary" },
-    { label: "Latest Accuracy", value: testAttempts?.[0]?.accuracyPercentage.toFixed(0) + "%" || "0%", icon: <Target />, color: "text-secondary" },
-    { label: "Recent Domain", value: testAttempts?.[0]?.testDomain || "None", icon: <Clock />, color: "text-primary" },
-    { label: "Learning Status", value: "Active", icon: <BookOpen />, color: "text-secondary" },
+  const courses = [
+    { name: "C Programming", slug: "c", color: "from-blue-500 to-cyan-400" },
+    { name: "Data Structures", slug: "dsa", color: "from-purple-500 to-pink-400" },
+    { name: "DBMS", slug: "dbms", color: "from-orange-500 to-yellow-400" },
+    { name: "Python", slug: "python", color: "from-green-500 to-emerald-400" },
   ];
+
+  const getProgress = (slug: string) => {
+    return userData?.progress?.[slug] || 0;
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-16 space-y-8 md:space-y-12">
@@ -61,111 +71,136 @@ export default function DashboardPage() {
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter">
-              Welcome, <span className="text-neon-cyan">{user.displayName || user.email?.split('@')[0]}</span>
+              Welcome Back, <span className="text-neon-cyan">{userData?.firstName || user.displayName || user.email?.split('@')[0]}</span>
             </h1>
-            <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground shrink-0">Free Tier</span>
+            <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-muted-foreground shrink-0">
+              {userData?.enrollmentStatus === 'premium' ? 'Premium Protocol' : 'Free Tier'}
+            </span>
           </div>
-          <p className="text-sm md:text-base text-muted-foreground font-medium">Your real-time placement preparation dashboard.</p>
+          <div className="flex items-center gap-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">
+             <span className="flex items-center gap-1.5"><ShieldCheck className="w-3 h-3" /> ID: {userData?.customId || "INITIALIZING..."}</span>
+             <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" /> Joined: {userData?.createdAt?.toDate()?.toLocaleDateString()}</span>
+          </div>
         </div>
         <Link href="/enroll" className="w-full md:w-auto">
-          <GlowButton variant="secondary" className="w-full px-8 py-6">Upgrade to Premium</GlowButton>
+          <GlowButton variant={userData?.enrollmentStatus === 'premium' ? 'outline' : 'secondary'} className="w-full px-8 py-6">
+            {userData?.enrollmentStatus === 'premium' ? 'Manage Subscription' : 'Upgrade to Premium'}
+          </GlowButton>
         </Link>
       </header>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-        {stats.map((stat, i) => (
-          <div key={i} className="glass-card p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] space-y-4 hover:neon-border-cyan transition-all group">
-            <div className={`p-3 md:p-4 bg-white/5 rounded-xl md:rounded-2xl w-fit ${stat.color} group-hover:scale-110 transition-all`}>
-              {stat.icon}
-            </div>
-            <div>
-              <div className="text-xl md:text-2xl font-black tracking-tight truncate">{stat.value}</div>
-              <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{stat.label}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12">
-        <div className="lg:col-span-2 space-y-6 md:space-y-8">
-          <section className="glass-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight flex items-center gap-3">
-                <LineChart className="w-5 h-5 md:w-6 md:h-6 text-primary" /> Analytics
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <section className="lg:col-span-3 glass-card p-8 rounded-[2.5rem] space-y-8">
+           <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-3">
+                <BookOpen className="w-6 h-6 text-primary" /> Learning Progress
               </h2>
-              <span className="text-[10px] font-black text-muted-foreground uppercase">Live Stream</span>
-            </div>
-            <div className="h-[200px] md:h-[300px] flex items-center justify-center border border-white/5 rounded-2xl md:rounded-3xl bg-black/20 text-muted-foreground text-sm italic p-4 text-center">
-              Detailed performance graph will render here as you complete more industrial mock tests.
-            </div>
-          </section>
-
-          <section className="glass-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] space-y-6 md:space-y-8">
-            <h2 className="text-xl md:text-2xl font-black uppercase tracking-tight">Recent Mission History</h2>
-            <div className="space-y-3 md:space-y-4">
-              {isHistoryLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+           </div>
+           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {courses.map((course) => (
+                <div key={course.slug} className="p-6 bg-white/5 rounded-3xl border border-white/5 space-y-4 hover:border-primary/20 transition-all group">
+                   <div className="flex items-center justify-between">
+                      <span className="font-black uppercase tracking-tighter text-lg">{course.name}</span>
+                      <span className="text-xs font-black text-primary">{getProgress(course.slug)}%</span>
+                   </div>
+                   <Progress value={getProgress(course.slug)} className="h-2 bg-white/10" />
+                   <Link href={`/practice/${course.slug}`} className="inline-flex items-center gap-2 text-[10px] font-black uppercase text-muted-foreground hover:text-primary transition-colors">
+                      Resume Learning <ChevronRight className="w-3 h-3" />
+                   </Link>
                 </div>
-              ) : testAttempts && testAttempts.length > 0 ? (
-                testAttempts.map((test, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 md:p-6 bg-white/5 rounded-xl md:rounded-2xl border border-white/5 hover:border-primary/20 transition-all cursor-default">
-                    <div>
-                      <div className="font-black text-sm md:text-lg uppercase tracking-tight">{test.testDomain}</div>
-                      <div className="text-[10px] md:text-xs font-bold text-muted-foreground uppercase tracking-widest">
-                        {test.attemptDate?.toDate?.()?.toLocaleDateString() || "In Progress"}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-lg md:text-xl font-black text-primary">{test.score}/{test.totalQuestions}</div>
-                      <div className="text-[8px] md:text-[10px] font-black text-muted-foreground uppercase">Score</div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="py-12 text-center glass rounded-2xl border-dashed border-white/10">
-                  <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">No mission history found. Start your first test!</p>
-                  <Link href="/test">
-                    <GlowButton variant="outline" size="sm" className="mt-4">Go to Exam Mode</GlowButton>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </section>
-        </div>
+              ))}
+           </div>
+        </section>
 
-        <aside className="space-y-6 md:space-y-8">
-          <div className="glass-card p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-secondary/20 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-all">
-              <Zap className="w-16 h-16 md:w-20 md:h-20 text-secondary" />
+        <aside className="space-y-6">
+          <div className="glass-card p-6 rounded-[2rem] border-secondary/20 relative overflow-hidden group h-full">
+            <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none group-hover:scale-110 transition-all">
+              <Trophy className="w-24 h-24 text-secondary" />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-secondary mb-3 md:mb-4">PrepStack Premium</h3>
-            <p className="text-xs md:text-sm text-muted-foreground font-medium mb-4 md:mb-6 leading-relaxed">Unlock live mentorship, target-company mocks, and industrial case studies.</p>
-            <ul className="space-y-2 md:space-y-3 mb-6 md:mb-8 text-[10px] md:text-xs font-black text-white/70 uppercase tracking-widest">
-              <li className="flex items-center gap-2"><div className="w-1 h-1 bg-secondary rounded-full" /> 3 Live Classes / Week</li>
-              <li className="flex items-center gap-2"><div className="w-1 h-1 bg-secondary rounded-full" /> Industry Mentors</li>
-              <li className="flex items-center gap-2"><div className="w-1 h-1 bg-secondary rounded-full" /> Mock Interviews</li>
-            </ul>
-            <Link href="/enroll">
-              <GlowButton variant="secondary" className="w-full">Get Enrolled</GlowButton>
-            </Link>
-          </div>
-
-          <div className="glass-card p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border-primary/20">
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-primary mb-3 md:mb-4 flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5" /> Recommended
-            </h3>
-            <div className="space-y-3 md:space-y-4">
-              <div className="p-4 bg-white/5 rounded-xl border border-white/5 space-y-1">
-                <div className="text-xs md:text-sm font-black uppercase">Graphs Deep Dive</div>
-                <div className="text-[8px] md:text-[10px] text-muted-foreground font-bold">Recommended for Tech Students</div>
-                <Link href="/practice/dsa" className="text-[8px] md:text-[10px] text-primary font-black uppercase flex items-center gap-1 mt-2 hover:gap-2 transition-all">
-                  Enter Module <ChevronRight className="w-3 h-3" />
-                </Link>
-              </div>
+            <h3 className="text-xl font-black uppercase tracking-tight text-secondary mb-4">Latest Achievement</h3>
+            <div className="space-y-4">
+               {testAttempts?.[0] ? (
+                 <>
+                   <div className="text-3xl font-black tracking-tighter">{testAttempts[0].accuracyPercentage.toFixed(1)}%</div>
+                   <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Accuracy in {testAttempts[0].testDomain}</div>
+                   <Link href="/test">
+                     <GlowButton variant="secondary" className="w-full mt-4">Retake Mock</GlowButton>
+                   </Link>
+                 </>
+               ) : (
+                 <div className="text-sm font-medium text-muted-foreground italic">No tests taken yet. Start your journey today!</div>
+               )}
             </div>
           </div>
         </aside>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+           <section className="glass-card p-8 rounded-[2.5rem] space-y-8">
+             <div className="flex items-center justify-between">
+               <h2 className="text-xl font-black uppercase tracking-tight">Recent Mission Log</h2>
+               <Link href="/test" className="text-[10px] font-black text-primary uppercase">View All Missions</Link>
+             </div>
+             <div className="space-y-4">
+                {isHistoryLoading ? (
+                  <div className="py-12 flex justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+                ) : testAttempts && testAttempts.length > 0 ? (
+                  testAttempts.map((test, i) => (
+                    <div key={i} className="flex items-center justify-between p-6 bg-white/5 rounded-3xl border border-white/5 hover:neon-border-cyan transition-all">
+                       <div>
+                          <div className="font-black text-lg uppercase tracking-tight">{test.testDomain}</div>
+                          <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                             {test.attemptDate?.toDate?.()?.toLocaleString() || "Syncing..."}
+                          </div>
+                       </div>
+                       <div className="text-right">
+                          <div className="text-2xl font-black text-primary">{test.score}/{test.totalQuestions}</div>
+                          <div className="text-[8px] font-black text-muted-foreground uppercase">Efficiency Rating</div>
+                       </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="py-12 text-center glass rounded-3xl border-dashed border-white/20">
+                    <p className="text-muted-foreground font-bold uppercase tracking-widest text-xs">No active data streams found.</p>
+                  </div>
+                )}
+             </div>
+           </section>
+        </div>
+
+        <section className="glass-card p-8 rounded-[2.5rem] border-primary/20 flex flex-col justify-between">
+           <div className="space-y-6">
+              <h3 className="text-xl font-black uppercase tracking-tight text-primary flex items-center gap-2">
+                <Target className="w-6 h-6" /> Target Analytics
+              </h3>
+              <div className="space-y-6">
+                 <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                    <span className="text-xs font-black text-muted-foreground uppercase">Missions Complete</span>
+                    <span className="text-lg font-black">{testAttempts?.length || 0}</span>
+                 </div>
+                 <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                    <span className="text-xs font-black text-muted-foreground uppercase">Average Precision</span>
+                    <span className="text-lg font-black text-neon-cyan">
+                      {testAttempts && testAttempts.length > 0 
+                        ? (testAttempts.reduce((acc, curr) => acc + curr.accuracyPercentage, 0) / testAttempts.length).toFixed(1) + "%"
+                        : "0%"}
+                    </span>
+                 </div>
+                 <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-muted-foreground uppercase">Learning Hours</span>
+                    <span className="text-lg font-black">12.4H</span>
+                 </div>
+              </div>
+           </div>
+           <div className="mt-8 pt-8 border-t border-white/5 space-y-4">
+              <div className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Next Recommended Step</div>
+              <div className="p-4 bg-primary/5 rounded-2xl border border-primary/20">
+                 <div className="font-black uppercase text-sm mb-1">Advanced Binary Trees</div>
+                 <div className="text-[10px] font-bold text-muted-foreground">Industrial Module 4</div>
+              </div>
+           </div>
+        </section>
       </div>
     </div>
   );
