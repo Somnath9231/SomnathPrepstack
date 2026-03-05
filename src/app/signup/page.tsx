@@ -11,6 +11,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { UserPlus, ShieldCheck, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({

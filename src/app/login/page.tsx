@@ -11,6 +11,7 @@ import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { LogIn, ShieldCheck, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [userId, setUserId] = useState("");
