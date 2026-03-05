@@ -7,12 +7,12 @@
 
 ## 🛠️ Core Features
 
-- **Dynamic Learning Roadmaps**: Personalized paths for B.Tech, BCA, and Non-Tech students.
-- **Deep Learning Modules**: Comprehensive breakdowns of DSA, Algorithms, DBMS, OS, and Networking with code benchmarks and industrial insights.
-- **Interactive Exam Engine**: 20-minute timed industrial simulations with real-time performance analytics.
-- **Early Bird Enrollment**: An optional premium mentorship program featuring live classes, target-company training, and personal career guidance.
-- **Student Dashboard**: A centralized hub for tracking progress, accuracy, and test history.
-- **Secure Authentication**: Integrated with Firebase for seamless Google and Email/Password login.
+- **Unique ID Authentication**: Secure protocol using custom 10-character alphanumeric IDs (No Google Auth required).
+- **Professor-Level Learning Modules**: Structured deep dives into DSA, Algorithms, DBMS, OS, Networking, and System Design.
+- **20/20 Mock Test Engine**: Rigorous 20-minute simulations with 20 randomized questions per attempt.
+- **Dynamic Learning Roadmaps**: Personalized industrial paths for B.Tech, BCA, and Non-Tech students.
+- **Real-Time Student Dashboard**: Centralized hub tracking precision, accuracy, and course completion.
+- **Mobile Optimized**: Fully responsive interface designed for industrial prep on any device.
 
 ## 🛠️ Tech Stack
 
@@ -20,9 +20,9 @@
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [Shadcn UI](https://ui.shadcn.com/)
 - **Backend/Auth**: [Firebase](https://firebase.google.com/)
-- **AI**: [Genkit](https://github.com/firebase/genkit) for personalized resource and roadmap generation.
+- **AI**: [Genkit](https://github.com/firebase/genkit) for personalized roadmap generation.
 
-## 🚀 How to Deploy to GitHub (Easy Guide)
+## 🚀 How to Deploy (Step-by-Step)
 
 Follow these steps in your terminal to push this project to your GitHub repository:
 
@@ -43,7 +43,7 @@ Follow these steps in your terminal to push this project to your GitHub reposito
 
 4. **Commit the changes**:
    ```bash
-   git commit -m "Initial Launch of PrepStack Platform"
+   git commit -m "Final Launch of PrepStack Platform"
    ```
 
 5. **Set branch to main**:
@@ -58,7 +58,7 @@ Follow these steps in your terminal to push this project to your GitHub reposito
 
 ## 📝 Platform Disclaimer
 
-PrepStack is a high-fidelity educational demonstration platform. This entire project—including the core concept, structure, and design—was originally conceived and architected by **Somnath Podder**. The code has been developed and optimized with the assistance of advanced AI technologies, including ChatGPT, Gemini, Firebase Studio, and more.
+PrepStack is a high-fidelity educational demonstration platform. This entire project—including the core concept, structure, and design—was originally conceived and architected by **Somnath Podder**. The code has been developed and optimized with the assistance of advanced AI technologies.
 
 ## 🧑‍💻 Developed By
 
