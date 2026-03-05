@@ -17,7 +17,6 @@ export default function SignupPage() {
     firstName: "",
     lastName: "",
     customId: "",
-    email: "",
     password: "",
     confirmPassword: ""
   });
@@ -29,54 +28,69 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (formData.customId.length !== 10) {
-      toast({ title: "Invalid ID", description: "User ID must be exactly 10 characters.", variant: "destructive" });
+    // Alphanumeric check and length check
+    const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+    if (formData.customId.length !== 10 || !alphanumericRegex.test(formData.customId)) {
+      toast({ 
+        title: "Invalid ID", 
+        description: "User ID must be exactly 10 alphanumeric characters.", 
+        variant: "destructive" 
+      });
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
+      toast({ 
+        title: "Error", 
+        description: "Passwords do not match.", 
+        variant: "destructive" 
+      });
       return;
     }
 
     setLoading(true);
 
     try {
-      // 1. Check if customId is unique
-      const idRef = doc(db, "customUserIds", formData.customId);
+      const customIdUpper = formData.customId.toUpperCase();
+      const idRef = doc(db, "customUserIds", customIdUpper);
       const idSnap = await getDoc(idRef);
       
       if (idSnap.exists()) {
-        toast({ title: "ID Taken", description: "This ID already exists. Please choose another ID.", variant: "destructive" });
+        toast({ 
+          title: "ID Already Exists", 
+          description: "This ID already exists. Please choose another ID.", 
+          variant: "destructive" 
+        });
         setLoading(false);
         return;
       }
 
-      // 2. Create Auth User
-      const result = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      // Map custom ID to a local domain email for Firebase Auth
+      const mappedEmail = `${customIdUpper.toLowerCase()}@prepstack.local`;
+      const result = await createUserWithEmailAndPassword(auth, mappedEmail, formData.password);
       
-      // 3. Update Profile
       await updateProfile(result.user, {
         displayName: `${formData.firstName} ${formData.lastName}`
       });
 
-      // 4. Save to Firestore (Custom ID Lookup and User Profile)
+      // Reserve ID
       await setDoc(idRef, { uid: result.user.uid });
       
+      // Create User Profile
       const userRef = doc(db, "users", result.user.uid);
       await setDoc(userRef, {
         id: result.user.uid,
-        customId: formData.customId,
+        customId: customIdUpper,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email,
+        email: mappedEmail,
         createdAt: serverTimestamp(),
         lastLoginAt: serverTimestamp(),
         enrollmentStatus: "free",
         progress: {}
       });
 
-      toast({ title: "Welcome to PrepStack!", description: "Account created successfully." });
+      toast({ title: "Protocol Initialized", description: `Welcome to PrepStack, ${formData.firstName}!` });
       router.push("/dashboard");
     } catch (error: any) {
       toast({ title: "Signup Failed", description: error.message, variant: "destructive" });
@@ -108,6 +122,7 @@ export default function SignupPage() {
                 value={formData.firstName}
                 onChange={(e) => setFormData({...formData, firstName: e.target.value})}
                 required
+                suppressHydrationWarning
               />
             </div>
             <div className="space-y-2">
@@ -119,6 +134,7 @@ export default function SignupPage() {
                 value={formData.lastName}
                 onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                 required
+                suppressHydrationWarning
               />
             </div>
           </div>
@@ -133,19 +149,7 @@ export default function SignupPage() {
               value={formData.customId}
               onChange={(e) => setFormData({...formData, customId: e.target.value.toUpperCase()})}
               required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input 
-              id="email" 
-              type="email" 
-              placeholder="somnath@prepstack.com" 
-              className="glass"
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              required
+              suppressHydrationWarning
             />
           </div>
 
@@ -159,6 +163,7 @@ export default function SignupPage() {
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
                 required
+                suppressHydrationWarning
               />
             </div>
             <div className="space-y-2">
@@ -170,12 +175,13 @@ export default function SignupPage() {
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                 required
+                suppressHydrationWarning
               />
             </div>
           </div>
 
-          <GlowButton type="submit" className="w-full py-8 text-xl" disabled={loading}>
-            {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Create Account <UserPlus className="w-5 h-5 ml-2" /></>}
+          <GlowButton type="submit" className="w-full py-8 text-xl" disabled={loading} suppressHydrationWarning>
+            {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : <>Access System <UserPlus className="w-5 h-5 ml-2" /></>}
           </GlowButton>
         </form>
 

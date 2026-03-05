@@ -1,20 +1,43 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { GlowButton } from "@/components/GlowButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { roadmapsData } from "@/data/roadmaps";
 import { generateRoadmap, RoadmapGenerationOutput } from "@/ai/flows/generate-roadmap";
-import { Loader2, Sparkles, Map, Target, Award } from "lucide-react";
+import { Loader2, Sparkles, Map, Target, Award, ShieldAlert } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useUser } from "@/firebase";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function RoadmapsPage() {
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [careerGoals, setCareerGoals] = useState("");
   const [experienceLevel, setExperienceLevel] = useState("beginner");
   const [aiRoadmap, setAiRoadmap] = useState<RoadmapGenerationOutput | null>(null);
+
+  if (isUserLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>;
+
+  if (!user) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-32 text-center space-y-8">
+        <div className="w-20 h-20 bg-secondary/10 rounded-full flex items-center justify-center mx-auto text-secondary">
+          <ShieldAlert className="w-10 h-10" />
+        </div>
+        <h1 className="text-4xl font-black uppercase tracking-tighter">Access <span className="text-neon-pink">Restricted</span></h1>
+        <p className="text-muted-foreground font-medium">Placement Roadmaps are part of our core industrial protocol. You must be identified to access these sequences.</p>
+        <Link href="/login" className="block">
+          <GlowButton variant="secondary" className="w-full py-7">Enter Stack to Unlock</GlowButton>
+        </Link>
+      </div>
+    );
+  }
 
   const handleGenerate = async () => {
     if (!careerGoals) {
@@ -39,7 +62,6 @@ export default function RoadmapsPage() {
         <p className="text-muted-foreground">Step-by-step guidance curated by industry experts to help you navigate your placement journey.</p>
       </div>
 
-      {/* AI Roadmap Generator */}
       <section className="glass-card rounded-3xl p-8 lg:p-12 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
           <Sparkles className="w-32 h-32 text-primary" />
@@ -63,6 +85,7 @@ export default function RoadmapsPage() {
                   className="glass" 
                   value={careerGoals}
                   onChange={(e) => setCareerGoals(e.target.value)}
+                  suppressHydrationWarning
                 />
               </div>
               <div className="space-y-2">
@@ -72,6 +95,7 @@ export default function RoadmapsPage() {
                   className="flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-primary"
                   value={experienceLevel}
                   onChange={(e) => setExperienceLevel(e.target.value)}
+                  suppressHydrationWarning
                 >
                   <option value="beginner">Beginner (No coding experience)</option>
                   <option value="intermediate">Intermediate (Knows basics)</option>
@@ -82,6 +106,7 @@ export default function RoadmapsPage() {
                 onClick={handleGenerate} 
                 disabled={loading}
                 className="w-full h-12"
+                suppressHydrationWarning
               >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Generate My Roadmap"}
               </GlowButton>
@@ -116,7 +141,6 @@ export default function RoadmapsPage() {
         </div>
       </section>
 
-      {/* Static Roadmaps */}
       <section className="space-y-8">
         <h2 className="text-3xl font-bold font-headline text-center">Popular Roadmaps</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

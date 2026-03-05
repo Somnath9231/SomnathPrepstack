@@ -1,9 +1,11 @@
+
 "use client";
 
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GlowButton } from "@/components/GlowButton";
-import { Code2, Brain, MessageSquare, Terminal, Database, Globe, Network, Cpu, FileCheck, Users, ArrowRight } from "lucide-react";
+import { Code2, Brain, MessageSquare, Terminal, Database, Globe, Network, Cpu, FileCheck, ShieldAlert, ArrowRight, Loader2 } from "lucide-react";
+import { useUser } from "@/firebase";
 
 const techModules = [
   { slug: "dsa", name: "Data Structures", icon: <Code2 />, topics: ["Arrays", "Linked List", "Trees", "Graphs", "DP"] },
@@ -21,6 +23,25 @@ const nonTechModules = [
 ];
 
 export default function PracticePage() {
+  const { user, isUserLoading } = useUser();
+
+  if (isUserLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>;
+
+  if (!user) {
+    return (
+      <div className="max-w-xl mx-auto px-4 py-32 text-center space-y-8">
+        <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
+          <ShieldAlert className="w-10 h-10" />
+        </div>
+        <h1 className="text-4xl font-black uppercase tracking-tighter">Deep Mode <span className="text-neon-cyan">Locked</span></h1>
+        <p className="text-muted-foreground font-medium">Access to industrial practice modules requires an active student identity. Please sign in to resume your training protocol.</p>
+        <Link href="/login" className="block">
+          <GlowButton className="w-full py-7">Sign In to Unlock Deep Mode</GlowButton>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-24 space-y-20">
       <div className="text-center space-y-6 max-w-3xl mx-auto">
@@ -31,8 +52,8 @@ export default function PracticePage() {
       <Tabs defaultValue="tech" className="w-full">
         <div className="flex justify-center mb-16">
           <TabsList className="glass p-2 h-16 rounded-full">
-            <TabsTrigger value="tech" className="rounded-full px-12 h-full text-sm font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Technical Streams</TabsTrigger>
-            <TabsTrigger value="general" className="rounded-full px-12 h-full text-sm font-black uppercase tracking-widest data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground">Foundations</TabsTrigger>
+            <TabsTrigger value="tech" className="rounded-full px-12 h-full text-sm font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>Technical Streams</TabsTrigger>
+            <TabsTrigger value="general" className="rounded-full px-12 h-full text-sm font-black uppercase tracking-widest data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground" suppressHydrationWarning>Foundations</TabsTrigger>
           </TabsList>
         </div>
 
@@ -52,7 +73,7 @@ export default function PracticePage() {
                 ))}
               </ul>
               <Link href={`/practice/${module.slug}`}>
-                <GlowButton variant="outline" className="w-full py-7 group/btn">
+                <GlowButton variant="outline" className="w-full py-7 group/btn" suppressHydrationWarning>
                   Enter Deep Mode <ArrowRight className="w-4 h-4 ml-2 transition-all group-hover/btn:translate-x-2" />
                 </GlowButton>
               </Link>
@@ -76,7 +97,7 @@ export default function PracticePage() {
                 ))}
               </ul>
               <Link href={`/practice/${module.slug}`}>
-                <GlowButton variant="secondary" className="w-full py-7 group/btn">
+                <GlowButton variant="secondary" className="w-full py-7 group/btn" suppressHydrationWarning>
                   Master Now <ArrowRight className="w-4 h-4 ml-2 transition-all group-hover/btn:translate-x-2" />
                 </GlowButton>
               </Link>
