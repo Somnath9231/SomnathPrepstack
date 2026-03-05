@@ -1,230 +1,173 @@
-export const learningContent = {
+export interface Section {
+  subtitle: string;
+  content: string;
+  code?: string;
+}
+
+export interface Module {
+  id: string;
+  title: string;
+  description: string;
+  sections: Section[];
+}
+
+export interface CourseContent {
+  title: string;
+  description: string;
+  modules: Module[];
+}
+
+export const learningContent: Record<string, CourseContent> = {
   dsa: {
-    title: "Data Structures",
-    description: "The fundamental building blocks of efficient software. Master how data is organized and stored.",
-    sections: [
+    title: "Data Structures & Algorithms",
+    description: "Master the architecture of efficient code through structured data organization and algorithmic optimization.",
+    modules: [
       {
-        subtitle: "Industrial Context",
-        content: "In production-level software, choosing the right data structure can be the difference between a high-performance system and a failing one. Tech giants like Google and Meta test this extensively because it reflects your ability to optimize memory and processing time."
+        id: "m1",
+        title: "Module 1: Foundations of Complexity",
+        description: "Understanding Big O notation and basic structures.",
+        sections: [
+          {
+            subtitle: "Time and Space Complexity",
+            content: "As a professor would explain, complexity isn't about time in seconds, but growth in steps. We analyze how 'n' (input size) affects performance.",
+            code: "// O(n) example\nfor(int i=0; i<n; i++) { ... }"
+          }
+        ]
       },
       {
-        subtitle: "Arrays & Linked Lists",
-        content: "Arrays offer O(1) access but O(n) insertion. Linked Lists offer O(1) insertion but O(n) access. Knowing when to use which is vital for system efficiency.",
-        code: "int[] arr = new int[5]; // Fixed size\nLinkedList<Integer> list = new LinkedList<>(); // Dynamic"
+        id: "m2",
+        title: "Module 2: Linear Data Structures",
+        description: "Deep dive into Arrays, Linked Lists, Stacks, and Queues.",
+        sections: [
+          {
+            subtitle: "The Power of Linked Lists",
+            content: "Unlike arrays, linked lists are dynamic. They allow O(1) insertions at the cost of O(n) access. Ideal for systems where memory is fragmented.",
+          }
+        ]
       },
       {
-        subtitle: "Trees & Graphs",
-        content: "Trees are used for hierarchical data (like folders) while Graphs represent network connections (like social media or maps). Mastering BFS and DFS is essential.",
-      }
-    ]
-  },
-  algorithms: {
-    title: "Algorithms",
-    description: "The logic behind solving complex problems efficiently. Focus on Time and Space Complexity.",
-    sections: [
-      {
-        subtitle: "Sorting & Searching",
-        content: "From Quick Sort to Binary Search, these are the core operations performed billions of times per second in any database or search engine.",
-        code: "void quickSort(int arr[], int low, int high) {\n  // Partitioning logic...\n}"
+        id: "m3",
+        title: "Module 3: Non-Linear Structures",
+        description: "Trees, Graphs, and Heaps.",
+        sections: [
+          {
+            subtitle: "Binary Search Trees",
+            content: "The golden standard for sorted data retrieval. Each node has at most two children, ensuring logarithmic search time.",
+          }
+        ]
       },
       {
-        subtitle: "Dynamic Programming",
-        content: "Optimization technique used to solve complex problems by breaking them into smaller overlapping subproblems. Essential for cracking FAANG interviews.",
+        id: "m4",
+        title: "Module 4: Interview Masterclass",
+        description: "Solving FAANG-level problems with optimization.",
+        sections: [
+          {
+            subtitle: "Sliding Window Technique",
+            content: "A must-know for competitive programming to solve array/string problems in O(n) instead of O(n^2).",
+          }
+        ]
       }
     ]
   },
   dbms: {
-    title: "Database Management",
-    description: "Master the architecture of data storage, retrieval, and integrity.",
-    sections: [
+    title: "Database Management Systems",
+    description: "Professional database architecture and management for industrial scalability.",
+    modules: [
       {
-        subtitle: "SQL vs NoSQL",
-        content: "Relational databases (MySQL, Postgres) use structured tables, while NoSQL (MongoDB, Redis) handles unstructured, high-velocity data. Industrial systems often use both.",
-        code: "SELECT * FROM users JOIN orders ON users.id = orders.user_id;"
+        id: "m1",
+        title: "Module 1: Relational Foundations",
+        description: "ER Diagrams and the Relational Model.",
+        sections: [
+          {
+            subtitle: "Entity-Relationship Mapping",
+            content: "Before writing code, we architect data. Entities represent real-world objects, and Relationships define their interactions.",
+          }
+        ]
       },
       {
-        subtitle: "Normalization",
-        content: "Process of organizing data to reduce redundancy and improve data integrity (1NF, 2NF, 3NF, BCNF)."
-      }
-    ]
-  },
-  os: {
-    title: "Operating Systems",
-    description: "Understand the bridge between hardware and software.",
-    sections: [
-      {
-        subtitle: "Process vs Threads",
-        content: "A process is a program in execution, while a thread is the smallest unit of processing within a process. Multithreading is key for high-concurrency apps.",
+        id: "m2",
+        title: "Module 2: Advanced SQL & Optimization",
+        description: "Mastering Joins, Indexing, and Subqueries.",
+        sections: [
+          {
+            subtitle: "Indexing for Performance",
+            content: "Indexes are like book catalogs. They speed up searches at the cost of disk space and slower writes.",
+            code: "CREATE INDEX idx_user_name ON users(name);"
+          }
+        ]
       },
       {
-        subtitle: "Memory Management",
-        content: "Virtual memory, Paging, and Segmentation. These concepts are core to system-level debugging."
-      }
-    ]
-  },
-  networks: {
-    title: "Computer Networks",
-    description: "The backbone of the internet and modern communication.",
-    sections: [
-      {
-        subtitle: "OSI Model",
-        content: "Seven layers that define how data travels across a network. From Physical signals to Application logic (HTTP/FTP).",
+        id: "m3",
+        title: "Module 3: Normalization & Integrity",
+        description: "Ensuring data consistency through 1NF to BCNF.",
+        sections: [
+          {
+            subtitle: "3rd Normal Form",
+            content: "The goal is to eliminate transitive dependencies. Every non-prime attribute must depend solely on the primary key.",
+          }
+        ]
       },
       {
-        subtitle: "TCP/IP Protocol Suite",
-        content: "The real-world protocol used for the internet. TCP for reliability, UDP for speed.",
-      }
-    ]
-  },
-  "system-design": {
-    title: "System Design",
-    description: "Learn how to build scalable, high-availability distributed systems.",
-    sections: [
-      {
-        subtitle: "Load Balancing",
-        content: "Distributing incoming network traffic across multiple servers to ensure no single server becomes a bottleneck.",
-      },
-      {
-        subtitle: "Caching Strategies",
-        content: "Using Redis or Memcached to store frequently accessed data for sub-millisecond latency.",
-      }
-    ]
-  },
-  aptitude: {
-    title: "Industrial Aptitude",
-    description: "Logical reasoning and quantitative analysis for competitive placements.",
-    sections: [
-      {
-        subtitle: "Quantitative Mastery",
-        content: "Focus on Time-Speed-Distance, Profit & Loss, and Probability. These test your quick analytical thinking.",
-      },
-      {
-        subtitle: "Logical Reasoning",
-        content: "Syllogisms, Blood Relations, and Seating Arrangements. Crucial for the initial screening rounds of top firms.",
-      }
-    ]
-  },
-  verbal: {
-    title: "Verbal Ability",
-    description: "Effective communication and comprehensive reading skills.",
-    sections: [
-      {
-        subtitle: "Critical Reasoning",
-        content: "Analyzing arguments, identifying assumptions, and drawing valid conclusions.",
-      },
-      {
-        subtitle: "Professional Etiquette",
-        content: "Email writing, formal vocabulary, and corporate communication standards.",
-      }
-    ]
-  },
-  "interview-prep": {
-    title: "Interview Protocol",
-    description: "The final frontier. Master behavioral and technical interview strategies.",
-    sections: [
-      {
-        subtitle: "The STAR Method",
-        content: "Situation, Task, Action, Result. The standard framework for answering behavioral questions like 'Tell me about a time you failed.'",
-      },
-      {
-        subtitle: "HR Round Strategy",
-        content: "Salary negotiation, culture fit, and identifying your unique value proposition to the firm.",
-      }
-    ]
-  },
-  c: {
-    title: "C Programming",
-    description: "The foundation of modern computing. Learn low-level memory control.",
-    sections: [
-      {
-        subtitle: "Memory & Pointers",
-        content: "Direct access to hardware via memory addresses. This is where high-performance software begins.",
-        code: "int *p = &x; // Pointer assignment"
-      }
-    ]
-  },
-  cpp: {
-    title: "C++ Programming",
-    description: "The language of performance. Used in high-frequency trading, game engines, and operating systems.",
-    sections: [
-      {
-        subtitle: "The Power of Pointers",
-        content: "C++ gives you direct memory control. Pointers allow for efficient data manipulation but require manual memory management.",
-        code: "int x = 10;\nint* ptr = &x; // ptr holds memory address of x"
-      },
-      {
-        subtitle: "Object Oriented Programming",
-        content: "Encapsulation, Inheritance, Polymorphism, and Abstraction. These are the 4 pillars of modern software design.",
-      }
-    ]
-  },
-  java: {
-    title: "Java Enterprise",
-    description: "The industry standard for secure, large-scale backend systems.",
-    sections: [
-      {
-        subtitle: "JVM Architecture",
-        content: "Write Once, Run Anywhere. Understanding Bytecode and Garbage Collection.",
-        code: "public static void main(String[] args) {\n  System.out.println(\"Hello PrepStack\");\n}"
+        id: "m4",
+        title: "Module 4: Distributed DBs & NoSQL",
+        description: "Scaling data globally for millions of users.",
+        sections: [
+          {
+            subtitle: "CAP Theorem",
+            content: "Consistency, Availability, and Partition Tolerance. In a distributed system, you can only pick two.",
+          }
+        ]
       }
     ]
   },
   python: {
-    title: "Python 3",
-    description: "The Swiss Army knife of tech. Simple syntax, immense power in AI and Data Science.",
-    sections: [
+    title: "Python for Industrial Tech",
+    description: "From scripting basics to advanced enterprise-level development.",
+    modules: [
       {
-        subtitle: "Pythonic Code",
-        content: "Focus on readability and efficiency using list comprehensions and generators.",
-        code: "squared = [x**2 for x in range(10)]"
+        id: "m1",
+        title: "Module 1: Core Fundamentals",
+        description: "Variables, Loops, and Data Types.",
+        sections: [
+          {
+            subtitle: "Pythonic Logic",
+            content: "Python emphasizes readability. Variables are dynamically typed, making it the perfect starting point for developers.",
+            code: "name = 'PrepStack'\nprint(f'Hello {name}')"
+          }
+        ]
       },
       {
-        subtitle: "Libraries & Ecosystem",
-        content: "NumPy, Pandas, and Scikit-Learn. The foundation of modern Data Science and ML.",
-      }
-    ]
-  },
-  javascript: {
-    title: "JavaScript Core",
-    description: "The language that powers the modern web interface.",
-    sections: [
+        id: "m2",
+        title: "Module 2: Functional & OOP Python",
+        description: "Mastering Functions and Class-based design.",
+        sections: [
+          {
+            subtitle: "Decorators and Generators",
+            content: "Advanced Pythonic features that allow for powerful function wrapping and memory-efficient iteration.",
+          }
+        ]
+      },
       {
-        subtitle: "Asynchronous JS",
-        content: "Mastering Promises, Async/Await, and the Event Loop for responsive UI.",
-        code: "const data = await fetch('/api/user').then(r => r.json());"
-      }
-    ]
-  },
-  html: {
-    title: "HTML5 Structure",
-    description: "The semantic skeleton of every web application.",
-    sections: [
+        id: "m3",
+        title: "Module 3: Data Science Libraries",
+        description: "NumPy, Pandas, and Scikit-Learn.",
+        sections: [
+          {
+            subtitle: "Data Manipulation",
+            content: "Learn how to process millions of rows of data with vectorized operations in Pandas.",
+          }
+        ]
+      },
       {
-        subtitle: "Semantic Tags",
-        content: "Improving accessibility and SEO using header, footer, section, and main tags.",
-        code: "<main>\n  <section>Content Here</section>\n</main>"
-      }
-    ]
-  },
-  css: {
-    title: "Modern CSS",
-    description: "Styling the web with Flexbox, Grid, and Animations.",
-    sections: [
-      {
-        subtitle: "Layout Engines",
-        content: "Mastering Flexbox and Grid for responsive, industrial-grade layouts.",
-        code: ".container {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n}"
-      }
-    ]
-  },
-  sql: {
-    title: "SQL Mastery",
-    description: "Relational database querying and optimization.",
-    sections: [
-      {
-        subtitle: "Complex Joins",
-        content: "Inner, Left, Right, and Full Outer joins. Essential for data analysis.",
-        code: "SELECT name FROM students WHERE id IN (SELECT student_id FROM marks);"
+        id: "m4",
+        title: "Module 4: Enterprise Projects",
+        description: "API development and Backend Architecture.",
+        sections: [
+          {
+            subtitle: "Flask & FastAPI",
+            content: "Building high-performance REST APIs for modern web applications.",
+          }
+        ]
       }
     ]
   }
