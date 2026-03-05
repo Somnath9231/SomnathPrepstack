@@ -4,11 +4,15 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user account on the PrepStack platform, storing profile information and authentication identifiers (excluding passwords).",
+      "description": "Represents a student user account on the PrepStack platform. Stores profile information and references to personalized data.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the User entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "A unique 10-character alphanumeric user ID chosen by the user for login purposes. (Must be unique across all users)."
         },
         "firstName": {
           "type": "string",
@@ -18,16 +22,7 @@
           "type": "string",
           "description": "The last name of the user."
         },
-        "username": {
-          "type": "string",
-          "description": "The unique 10-character alphanumeric user ID used for login. (Must be unique across all users.)"
-        },
-        "email": {
-          "type": "string",
-          "description": "The email address of the user, used for contact and account recovery.",
-          "format": "email"
-        },
-        "lastLoginAt": {
+        "lastLogin": {
           "type": "string",
           "description": "Timestamp of the user's last successful login.",
           "format": "date-time"
@@ -36,13 +31,19 @@
           "type": "string",
           "description": "Timestamp when the user account was created.",
           "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the user account information was last updated.",
+          "format": "date-time"
         }
       },
       "required": [
         "id",
+        "userId",
         "firstName",
         "lastName",
-        "username",
+        "lastLogin",
         "createdAt"
       ]
     },
@@ -50,15 +51,15 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Course",
       "type": "object",
-      "description": "Represents a major learning subject or programming language module on the platform.",
+      "description": "Represents a broad learning subject or programming language module offered on PrepStack.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the Course entity."
         },
-        "title": {
+        "name": {
           "type": "string",
-          "description": "The title of the course (e.g., 'Data Structures', 'Python Programming')."
+          "description": "The name of the course (e.g., 'Data Structures', 'Python')."
         },
         "description": {
           "type": "string",
@@ -66,26 +67,30 @@
         },
         "category": {
           "type": "string",
-          "description": "The category of the course (e.g., 'Computer Science', 'Programming Language', 'Aptitude')."
+          "description": "The category the course belongs to (e.g., 'Computer Science', 'Programming Language', 'Aptitude')."
         },
-        "imageUri": {
+        "difficulty": {
           "type": "string",
-          "description": "URI to an image representing the course for UI display.",
-          "format": "uri"
+          "description": "The general difficulty level of the course (e.g., 'Beginner', 'Intermediate', 'Advanced')."
+        },
+        "estimatedDurationMinutes": {
+          "type": "number",
+          "description": "Estimated total duration of the course content in minutes."
         }
       },
       "required": [
         "id",
-        "title",
+        "name",
         "description",
-        "category"
+        "category",
+        "difficulty"
       ]
     },
     "Module": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Module",
       "type": "object",
-      "description": "Represents a specific section or sub-topic within a Course, containing detailed lessons and content.",
+      "description": "Represents a specific learning module within a Course, breaking down the subject into manageable sections.",
       "properties": {
         "id": {
           "type": "string",
@@ -95,9 +100,9 @@
           "type": "string",
           "description": "Reference to the Course this module belongs to. (Relationship: Course 1:N Module)"
         },
-        "title": {
+        "name": {
           "type": "string",
-          "description": "The title of the module (e.g., 'Module 1: Basics', 'Stack and Queue Operations')."
+          "description": "The name of the module (e.g., 'Arrays', 'Basics', 'Intermediate Programming')."
         },
         "description": {
           "type": "string",
@@ -105,50 +110,64 @@
         },
         "order": {
           "type": "number",
-          "description": "The display order of the module within its parent course."
+          "description": "The sequential order of this module within its parent course."
         },
-        "estimatedCompletionTimeMinutes": {
+        "estimatedDurationMinutes": {
           "type": "number",
-          "description": "The estimated time in minutes required to complete this module."
+          "description": "Estimated duration of the module content in minutes."
         }
       },
       "required": [
         "id",
         "courseId",
-        "title",
+        "name",
         "description",
         "order"
       ]
     },
-    "Lesson": {
+    "LearningContent": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Lesson",
+      "title": "LearningContent",
       "type": "object",
-      "description": "Represents a single learning unit or piece of content within a Module, such as an explanation, code example, or exercise.",
+      "description": "Represents individual learning items within a Module, such as explanations, code examples, or exercises.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Lesson entity."
+          "description": "Unique identifier for the LearningContent entity."
         },
         "moduleId": {
           "type": "string",
-          "description": "Reference to the Module this lesson belongs to. (Relationship: Module 1:N Lesson)"
+          "description": "Reference to the Module this content belongs to. (Relationship: Module 1:N LearningContent)"
         },
         "title": {
           "type": "string",
-          "description": "The title of the lesson (e.g., 'Introduction to Arrays', 'Binary Search Tree Concepts')."
+          "description": "The title of the learning content item (e.g., 'Introduction to Arrays', 'Bubble Sort Example')."
         },
         "contentType": {
           "type": "string",
-          "description": "The type of content this lesson primarily presents (e.g., 'explanation', 'codeExample', 'exercise', 'miniTest')."
+          "description": "The type of content (e.g., 'Explanation', 'Code Example', 'Exercise', 'Diagram', 'Quiz', 'Mini Test')."
         },
         "content": {
           "type": "string",
-          "description": "The main content of the lesson, which can include explanations, code snippets, diagrams, rich text, or exercise instructions. Stored as markdown or HTML."
+          "description": "The actual content, which could be HTML for explanations, code strings, or specific exercise instructions. (Consider using a rich text editor output or markdown)."
         },
         "order": {
           "type": "number",
-          "description": "The display order of the lesson within its parent module."
+          "description": "The sequential order of this content item within its parent module."
+        },
+        "resourceLinks": {
+          "type": "array",
+          "description": "An array of URLs to external resources related to this content.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "questionIds": {
+          "type": "array",
+          "description": "References to Question entities if this content includes quizzes or mini tests. (Relationship: Question N:N LearningContent)",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
@@ -160,39 +179,98 @@
         "order"
       ]
     },
+    "LearningProgress": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "LearningProgress",
+      "type": "object",
+      "description": "Tracks a user's progress through courses and modules, enabling resume learning and overall progress display.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the LearningProgress entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User whose progress is being tracked. (Relationship: User 1:N LearningProgress)"
+        },
+        "courseId": {
+          "type": "string",
+          "description": "Reference to the Course the user is studying. (Relationship: Course 1:N LearningProgress)"
+        },
+        "moduleId": {
+          "type": "string",
+          "description": "Reference to the specific Module the user is currently working on or has progressed in. (Relationship: Module 1:N LearningProgress)"
+        },
+        "learningContentId": {
+          "type": "string",
+          "description": "Reference to the specific LearningContent item the user last interacted with. (Relationship: LearningContent 1:N LearningProgress)"
+        },
+        "progressPercentage": {
+          "type": "number",
+          "description": "The completion percentage for the current module or course (0-100)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the learning (e.g., 'Not Started', 'In Progress', 'Completed')."
+        },
+        "lastAccessedAt": {
+          "type": "string",
+          "description": "Timestamp when this learning path was last accessed by the user.",
+          "format": "date-time"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Timestamp when this learning path was completed by the user, if applicable.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "courseId",
+        "moduleId",
+        "progressPercentage",
+        "status",
+        "lastAccessedAt"
+      ]
+    },
     "Test": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Test",
       "type": "object",
-      "description": "Represents a mock test or skill assessment with a defined set of questions.",
+      "description": "Defines a type of mock test available, including its configuration and associated questions.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the Test entity."
         },
-        "title": {
+        "name": {
           "type": "string",
-          "description": "The title of the test (e.g., 'Python Skill Test', 'Quantitative Aptitude Test')."
+          "description": "The name of the test (e.g., 'Quantitative Aptitude Test', 'Python Skill Test')."
         },
         "description": {
           "type": "string",
-          "description": "A brief description of the test's scope and content."
+          "description": "A brief description of what the test assesses."
         },
         "category": {
           "type": "string",
-          "description": "The category of the test (e.g., 'Programming', 'Aptitude', 'Computer Science')."
+          "description": "The category of the test (e.g., 'Aptitude', 'Programming', 'DSA')."
         },
         "durationMinutes": {
           "type": "number",
           "description": "The allowed duration for the test in minutes."
         },
-        "numQuestions": {
+        "totalQuestionsAvailable": {
           "type": "number",
-          "description": "The total number of questions in the test."
+          "description": "The total number of questions available in the question bank for this test type."
         },
-        "questionIds": {
+        "difficulty": {
+          "type": "string",
+          "description": "The general difficulty level of the test (e.g., 'Easy', 'Medium', 'Hard', 'Mixed')."
+        },
+        "questionPoolIds": {
           "type": "array",
-          "description": "References to Questions included in this test. (Relationship: Test N:N Question)",
+          "description": "References to Question entities that form the pool from which test questions are drawn. (Relationship: Question N:N Test)",
           "items": {
             "type": "string"
           }
@@ -200,74 +278,81 @@
       },
       "required": [
         "id",
-        "title",
+        "name",
         "description",
         "category",
         "durationMinutes",
-        "numQuestions",
-        "questionIds"
+        "totalQuestionsAvailable",
+        "questionPoolIds"
       ]
     },
     "Question": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Question",
       "type": "object",
-      "description": "Represents a single question that can be part of a test, supporting various question types and dynamic generation.",
+      "description": "Represents a single question with its options, correct answer, and additional metadata, supporting templated generation.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the Question entity."
         },
-        "questionText": {
+        "text": {
           "type": "string",
-          "description": "The text of the question, potentially including placeholders for dynamic values (e.g., 'If X trains travel Y km...')."
+          "description": "The main text of the question."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of question (e.g., 'MCQ', 'Numerical', 'Code Output', 'Templated MCQ')."
         },
         "options": {
           "type": "array",
-          "description": "An ordered list of answer options for multiple-choice questions. For numerical questions, this might be empty or contain hints.",
+          "description": "An array of possible answer options for MCQ questions.",
           "items": {
             "type": "string"
           }
         },
-        "correctOptionIndex": {
-          "type": "number",
-          "description": "The zero-based index of the correct option in the 'options' array. For numerical questions, this might point to a specific generated value."
-        },
-        "explanation": {
+        "correctAnswer": {
           "type": "string",
-          "description": "A detailed explanation of the correct answer and solution."
-        },
-        "tags": {
-          "type": "array",
-          "description": "Tags for categorizing the question (e.g., 'Arrays', 'Mathematics', 'Probability').",
-          "items": {
-            "type": "string"
-          }
+          "description": "The correct answer or the index of the correct option if it's an MCQ with ordered options."
         },
         "difficulty": {
           "type": "string",
-          "description": "The perceived difficulty of the question (e.g., 'Easy', 'Medium', 'Hard')."
+          "description": "The difficulty level of the question (e.g., 'Easy', 'Medium', 'Hard')."
         },
-        "questionType": {
+        "topic": {
           "type": "string",
-          "description": "The type of question (e.g., 'MCQ', 'Numerical', 'CodeSnippet')."
+          "description": "The specific topic this question belongs to (e.g., 'Arrays', 'Time & Work', 'OOP Concepts')."
+        },
+        "explanation": {
+          "type": "string",
+          "description": "A detailed explanation for the correct answer."
+        },
+        "tags": {
+          "type": "array",
+          "description": "An array of tags for categorizing and filtering questions (e.g., ['DSA', 'Beginner', 'Python']).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "templateVariables": {
+          "type": "string",
+          "description": "A JSON string containing key-value pairs for variables that can be randomized in templated questions (e.g., '{ \"X\": [10, 20, 30], \"Y\": [2, 4, 5] }')."
         }
       },
       "required": [
         "id",
-        "questionText",
-        "options",
-        "correctOptionIndex",
-        "explanation",
+        "text",
+        "type",
+        "correctAnswer",
         "difficulty",
-        "questionType"
+        "topic"
       ]
     },
     "TestAttempt": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "TestAttempt",
       "type": "object",
-      "description": "Records a user's single attempt at completing a Test, including their answers and final score.",
+      "description": "Records the details and results of each test taken by a user.",
       "properties": {
         "id": {
           "type": "string",
@@ -275,45 +360,52 @@
         },
         "userId": {
           "type": "string",
-          "description": "Reference to the User who made this test attempt. (Relationship: User 1:N TestAttempt)"
+          "description": "Reference to the User who attempted the test. (Relationship: User 1:N TestAttempt)"
         },
         "testId": {
           "type": "string",
-          "description": "Reference to the Test that was attempted. (Relationship: Test 1:N TestAttempt)"
+          "description": "Reference to the type of Test that was attempted. (Relationship: Test 1:N TestAttempt)"
         },
-        "startedAt": {
+        "attemptedAt": {
           "type": "string",
-          "description": "Timestamp when the user started the test attempt.",
-          "format": "date-time"
-        },
-        "completedAt": {
-          "type": "string",
-          "description": "Timestamp when the user completed or submitted the test attempt.",
+          "description": "Timestamp when the test attempt was completed.",
           "format": "date-time"
         },
         "score": {
           "type": "number",
-          "description": "The raw score obtained by the user in this attempt."
+          "description": "The score obtained by the user in this test attempt."
+        },
+        "totalQuestions": {
+          "type": "number",
+          "description": "The total number of questions presented in this specific test attempt."
+        },
+        "correctAnswers": {
+          "type": "number",
+          "description": "The number of questions answered correctly."
+        },
+        "wrongAnswers": {
+          "type": "number",
+          "description": "The number of questions answered incorrectly."
+        },
+        "unattemptedAnswers": {
+          "type": "number",
+          "description": "The number of questions left unanswered."
         },
         "accuracyPercentage": {
           "type": "number",
-          "description": "The percentage of correct answers out of attempted questions."
+          "description": "The accuracy percentage for this test attempt."
         },
         "attemptPercentage": {
           "type": "number",
-          "description": "The percentage of questions attempted out of the total number of questions."
+          "description": "The percentage of questions attempted in the test."
         },
-        "correctAnswersCount": {
+        "timeTakenSeconds": {
           "type": "number",
-          "description": "The total number of questions answered correctly."
+          "description": "The total time taken by the user to complete the test in seconds."
         },
-        "wrongAnswersCount": {
-          "type": "number",
-          "description": "The total number of questions answered incorrectly."
-        },
-        "answers": {
+        "selectedOptions": {
           "type": "array",
-          "description": "An array detailing the user's answer for each question in the test.",
+          "description": "An array storing the user's selected answers for each question in this attempt (e.g., [{questionId: 'q1', selected: 'A'}, {questionId: 'q2', selected: 'C'}]).",
           "items": {
             "type": "string"
           }
@@ -323,145 +415,112 @@
         "id",
         "userId",
         "testId",
-        "startedAt",
-        "completedAt",
+        "attemptedAt",
         "score",
+        "totalQuestions",
+        "correctAnswers",
+        "wrongAnswers",
+        "unattemptedAnswers",
         "accuracyPercentage",
         "attemptPercentage",
-        "correctAnswersCount",
-        "wrongAnswersCount",
-        "answers"
-      ]
-    },
-    "UserCourseProgress": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "UserCourseProgress",
-      "type": "object",
-      "description": "Tracks a user's overall learning progress for a specific Course.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the UserCourseProgress entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the User whose progress is being tracked. (Relationship: User 1:N UserCourseProgress)"
-        },
-        "courseId": {
-          "type": "string",
-          "description": "Reference to the Course for which progress is tracked. (Relationship: Course 1:N UserCourseProgress)"
-        },
-        "progressPercentage": {
-          "type": "number",
-          "description": "The completion percentage (0-100) of the course for the user."
-        },
-        "lastAccessedAt": {
-          "type": "string",
-          "description": "Timestamp of the last time the user accessed content within this course.",
-          "format": "date-time"
-        },
-        "completedAt": {
-          "type": "string",
-          "description": "Timestamp when the user completed the course, or null if not yet completed.",
-          "format": "date-time"
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "courseId",
-        "progressPercentage",
-        "lastAccessedAt"
-      ]
-    },
-    "UserModuleProgress": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "UserModuleProgress",
-      "type": "object",
-      "description": "Tracks a user's detailed progress within a specific Module, including their current lesson.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the UserModuleProgress entity."
-        },
-        "userId": {
-          "type": "string",
-          "description": "Reference to the User whose module progress is being tracked. (Relationship: User 1:N UserModuleProgress)"
-        },
-        "moduleId": {
-          "type": "string",
-          "description": "Reference to the Module for which progress is tracked. (Relationship: Module 1:N UserModuleProgress)"
-        },
-        "progressPercentage": {
-          "type": "number",
-          "description": "The completion percentage (0-100) of the module for the user."
-        },
-        "lastAccessedAt": {
-          "type": "string",
-          "description": "Timestamp of the last time the user accessed content within this module.",
-          "format": "date-time"
-        },
-        "completedAt": {
-          "type": "string",
-          "description": "Timestamp when the user completed the module, or null if not yet completed.",
-          "format": "date-time"
-        },
-        "currentLessonId": {
-          "type": "string",
-          "description": "Reference to the last Lesson the user was viewing in this module, allowing them to resume learning. (Relationship: Lesson 1:N UserModuleProgress)"
-        }
-      },
-      "required": [
-        "id",
-        "userId",
-        "moduleId",
-        "progressPercentage",
-        "lastAccessedAt"
+        "timeTakenSeconds"
       ]
     },
     "Roadmap": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Roadmap",
       "type": "object",
-      "description": "Defines a structured learning path, guiding students through a sequence of courses or modules.",
+      "description": "Defines a structured learning path composed of sequential steps, guiding users through their preparation.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the Roadmap entity."
         },
-        "title": {
+        "name": {
           "type": "string",
-          "description": "The title of the roadmap (e.g., 'B.Tech Placement Roadmap', 'Programming Starter Roadmap')."
+          "description": "The name of the roadmap (e.g., 'B.Tech Placement Roadmap', 'Programming Starter Roadmap')."
         },
         "description": {
           "type": "string",
-          "description": "A brief description of the roadmap and its objectives."
+          "description": "A description outlining the goals and content of the roadmap."
         },
-        "courseIds": {
-          "type": "array",
-          "description": "An ordered list of Course IDs that constitute this roadmap. (Relationship: Roadmap 1:N Course)",
-          "items": {
-            "type": "string"
-          }
+        "category": {
+          "type": "string",
+          "description": "The category of the roadmap (e.g., 'Placement', 'Skill Development', 'Career Change')."
         },
         "targetAudience": {
           "type": "string",
-          "description": "The intended audience for this roadmap (e.g., 'B.Tech Students', 'Beginners', 'Non-Tech to Tech')."
+          "description": "Describes the intended audience for this roadmap (e.g., 'B.Tech Students', 'Non-Tech Professionals')."
+        },
+        "stepIds": {
+          "type": "array",
+          "description": "Ordered references to the RoadmapStep entities that constitute this roadmap. (Relationship: Roadmap 1:N RoadmapStep)",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
         "id",
+        "name",
+        "description",
+        "category",
+        "targetAudience",
+        "stepIds"
+      ]
+    },
+    "RoadmapStep": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RoadmapStep",
+      "type": "object",
+      "description": "Represents an individual step within a larger Roadmap, linking to specific learning content or courses.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the RoadmapStep entity."
+        },
+        "roadmapId": {
+          "type": "string",
+          "description": "Reference to the Roadmap this step belongs to. (Relationship: Roadmap 1:N RoadmapStep)"
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of the roadmap step (e.g., 'Learn Programming Basics', 'Master Data Structures')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description of what this step entails."
+        },
+        "order": {
+          "type": "number",
+          "description": "The sequential order of this step within its parent roadmap."
+        },
+        "courseId": {
+          "type": "string",
+          "description": "Optional reference to a Course to be completed as part of this step. (Relationship: Course 1:N RoadmapStep)"
+        },
+        "moduleId": {
+          "type": "string",
+          "description": "Optional reference to a specific Module to be completed as part of this step. (Relationship: Module 1:N RoadmapStep)"
+        },
+        "learningContentId": {
+          "type": "string",
+          "description": "Optional reference to a specific LearningContent item for a focused step. (Relationship: LearningContent 1:N RoadmapStep)"
+        }
+      },
+      "required": [
+        "id",
+        "roadmapId",
         "title",
         "description",
-        "courseIds",
-        "targetAudience"
+        "order"
       ]
     },
     "Resource": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Resource",
       "type": "object",
-      "description": "Represents a supplementary learning resource such as a resume template, cheat sheet, or interview guide.",
+      "description": "Stores details about downloadable resources like resume templates, cheat sheets, and interview guides.",
       "properties": {
         "id": {
           "type": "string",
@@ -473,15 +532,19 @@
         },
         "description": {
           "type": "string",
-          "description": "A brief description of the resource's content or purpose."
+          "description": "A brief description of the resource's content."
+        },
+        "type": {
+          "type": "string",
+          "description": "The category type of the resource (e.g., 'Resume Template', 'Cheat Sheet', 'Interview Guide')."
         },
         "category": {
           "type": "string",
-          "description": "The category of the resource (e.g., 'Resume Templates', 'Cheat Sheets', 'Interview Guides')."
+          "description": "A more specific category for the resource (e.g., 'Fresher', 'DBMS', 'HR Questions')."
         },
         "fileUrl": {
           "type": "string",
-          "description": "The URL to the actual resource file (e.g., PDF document).",
+          "description": "The URL to the actual resource file (e.g., PDF).",
           "format": "uri"
         },
         "fileSizeKB": {
@@ -490,53 +553,72 @@
         },
         "previewImageUrl": {
           "type": "string",
-          "description": "The URL to a preview image for the resource.",
+          "description": "The URL to an image for previewing the resource.",
           "format": "uri"
         },
         "tags": {
           "type": "array",
-          "description": "A list of tags for classifying the resource (e.g., 'ATS', 'Fresher', 'Java').",
+          "description": "An array of keywords or tags for search and recommendation.",
           "items": {
             "type": "string"
           }
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the resource was added.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the resource information was last updated.",
+          "format": "date-time"
         }
       },
       "required": [
         "id",
         "title",
         "description",
-        "category",
+        "type",
         "fileUrl",
-        "fileSizeKB"
+        "fileSizeKB",
+        "createdAt"
       ]
     },
-    "ContactMessage": {
+    "ContactSubmission": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ContactMessage",
+      "title": "ContactSubmission",
       "type": "object",
-      "description": "Stores messages submitted by users through the contact form.",
+      "description": "Stores messages submitted through the website's contact form.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the ContactMessage entity."
+          "description": "Unique identifier for the ContactSubmission entity."
         },
         "name": {
           "type": "string",
-          "description": "The name of the person submitting the message."
+          "description": "The name provided by the submitter."
         },
         "email": {
           "type": "string",
-          "description": "The email address of the sender, for replies.",
+          "description": "The email address provided by the submitter for a response.",
           "format": "email"
         },
         "message": {
           "type": "string",
           "description": "The content of the message submitted."
         },
-        "sentAt": {
+        "submittedAt": {
           "type": "string",
-          "description": "Timestamp when the message was submitted.",
+          "description": "Timestamp when the contact form was submitted.",
           "format": "date-time"
+        },
+        "isRead": {
+          "type": "boolean",
+          "description": "A flag indicating whether the submission has been reviewed by an administrator."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Optional reference to the User if the submission was made by a logged-in user. (Relationship: User 1:N ContactSubmission)"
         }
       },
       "required": [
@@ -544,7 +626,8 @@
         "name",
         "email",
         "message",
-        "sentAt"
+        "submittedAt",
+        "isRead"
       ]
     }
   },
@@ -563,29 +646,27 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user profile information, accessible only by the owning user. The `{userId}` wildcard corresponds to the Firebase Authentication UID.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The Firebase Authentication User ID (UID) of the user."
-            }
-          ]
+          "description": "Stores core user profile information. The document ID `{userId}` corresponds to the Firebase Authentication UID. This document contains the user-chosen unique 'userId' (10-char alphanumeric)."
         }
       },
       {
-        "path": "/usernames/{usernameId}",
+        "path": "/customUserIds/{customUserId}",
         "definition": {
-          "entityName": "UsernameMapping",
+          "entityName": "User",
           "schema": {
-            "$ref": "#/backend/entities/UsernameMapping"
+            "$ref": "#/backend/entities/User"
           },
-          "description": "A lookup collection to enforce the uniqueness of the custom 10-character alphanumeric `username`. The document ID is the unique username itself, and it contains the Firebase UID of the user who claimed it. This ensures authorization independence for username uniqueness checks.",
-          "params": [
-            {
-              "name": "usernameId",
-              "description": "The unique 10-character alphanumeric user ID chosen by the user."
-            }
-          ]
+          "description": "A lookup collection to ensure the global uniqueness of the user-chosen 10-character alphanumeric 'userId'. The document ID `{customUserId}` is the user's chosen ID, and the document content maps to the actual Firebase Auth UID. Critical for authorization independence during signup."
+        }
+      },
+      {
+        "path": "/admins/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "A collection containing documents whose IDs correspond to Firebase Auth UIDs of users with administrative privileges. Used for Database Access Control (DBAC) to grant specific admin-only permissions."
         }
       },
       {
@@ -595,43 +676,75 @@
           "schema": {
             "$ref": "#/backend/entities/Course"
           },
-          "description": "Stores globally accessible course definitions. All documents in this collection share the same security posture (readable by authenticated users), facilitating QAPs and authorization independence.",
+          "description": "Stores definitions for all available learning courses (e.g., 'Python', 'Data Structures'). Read-only for authenticated users.",
           "params": [
             {
               "name": "courseId",
-              "description": "The unique identifier for the course."
+              "description": "The unique identifier for a Course."
             }
           ]
         }
       },
       {
-        "path": "/modules/{moduleId}",
+        "path": "/courses/{courseId}/modules/{moduleId}",
         "definition": {
           "entityName": "Module",
           "schema": {
             "$ref": "#/backend/entities/Module"
           },
-          "description": "Stores globally accessible module definitions, referencing their parent `courseId`. All modules are readable by authenticated users, ensuring authorization independence and QAPs.",
+          "description": "Stores definitions for modules within a specific course. Read-only for authenticated users. The `courseId` from the parent path is implicitly linked.",
           "params": [
             {
+              "name": "courseId",
+              "description": "The unique identifier of the parent Course."
+            },
+            {
               "name": "moduleId",
-              "description": "The unique identifier for the module."
+              "description": "The unique identifier for a Module."
             }
           ]
         }
       },
       {
-        "path": "/lessons/{lessonId}",
+        "path": "/courses/{courseId}/modules/{moduleId}/learningContent/{learningContentId}",
         "definition": {
-          "entityName": "Lesson",
+          "entityName": "LearningContent",
           "schema": {
-            "$ref": "#/backend/entities/Lesson"
+            "$ref": "#/backend/entities/LearningContent"
           },
-          "description": "Stores globally accessible lesson content, referencing their parent `moduleId`. All lessons are readable by authenticated users, ensuring authorization independence and QAPs.",
+          "description": "Stores individual learning items (explanations, code snippets, exercises) within a module. Read-only for authenticated users. The `moduleId` from the parent path is implicitly linked.",
           "params": [
             {
-              "name": "lessonId",
-              "description": "The unique identifier for the lesson."
+              "name": "courseId",
+              "description": "The unique identifier of the grandparent Course."
+            },
+            {
+              "name": "moduleId",
+              "description": "The unique identifier of the parent Module."
+            },
+            {
+              "name": "learningContentId",
+              "description": "The unique identifier for a LearningContent item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/learningProgressByModule/{moduleId}",
+        "definition": {
+          "entityName": "LearningProgress",
+          "schema": {
+            "$ref": "#/backend/entities/LearningProgress"
+          },
+          "description": "Tracks a specific user's progress for a particular module, including completion percentage, status, and last accessed content. The document ID `{moduleId}` corresponds to the module being tracked. Includes denormalized 'userId' via path for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The Firebase Auth UID of the student whose progress is being tracked."
+            },
+            {
+              "name": "moduleId",
+              "description": "The unique identifier of the module for which progress is tracked by this document."
             }
           ]
         }
@@ -643,11 +756,11 @@
           "schema": {
             "$ref": "#/backend/entities/Test"
           },
-          "description": "Stores globally accessible mock test definitions, including references to questions. All tests are readable by authenticated users, supporting QAPs and authorization independence.",
+          "description": "Stores definitions for all available mock tests (e.g., 'Quantitative Aptitude Test', 'Python Skill Test'). Read-only for authenticated users.",
           "params": [
             {
               "name": "testId",
-              "description": "The unique identifier for the test."
+              "description": "The unique identifier for a Test."
             }
           ]
         }
@@ -659,11 +772,11 @@
           "schema": {
             "$ref": "#/backend/entities/Question"
           },
-          "description": "Stores the global bank of questions used in tests. All questions are readable by authenticated users, ensuring QAPs and authorization independence.",
+          "description": "Stores individual question templates, options, and correct answers for the test engine. Read-only for authenticated users.",
           "params": [
             {
               "name": "questionId",
-              "description": "The unique identifier for the question."
+              "description": "The unique identifier for a Question."
             }
           ]
         }
@@ -675,55 +788,15 @@
           "schema": {
             "$ref": "#/backend/entities/TestAttempt"
           },
-          "description": "Records a user's attempt at a test. This data is user-specific, with the `userId` implicitly denormalized into the path for authorization independence. Only the owning user can read/write their own test attempts, supporting QAPs for user-specific data.",
+          "description": "Records details and results of each test taken by a specific user. Includes denormalized 'userId' via path for authorization independence.",
           "params": [
             {
               "name": "userId",
-              "description": "The Firebase Authentication User ID (UID) of the user who made the attempt."
+              "description": "The Firebase Auth UID of the student who made the test attempt."
             },
             {
               "name": "testAttemptId",
-              "description": "The unique identifier for a specific test attempt."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/courseProgress/{courseId}",
-        "definition": {
-          "entityName": "UserCourseProgress",
-          "schema": {
-            "$ref": "#/backend/entities/UserCourseProgress"
-          },
-          "description": "Tracks a user's overall progress for a specific course. The `{userId}` is denormalized in the path, and `{courseId}` serves as the document ID for 1:1 mapping, ensuring authorization independence and efficient QAPs for user-specific progress.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The Firebase Authentication User ID (UID) of the user whose progress is tracked."
-            },
-            {
-              "name": "courseId",
-              "description": "The unique identifier for the course."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/users/{userId}/moduleProgress/{moduleId}",
-        "definition": {
-          "entityName": "UserModuleProgress",
-          "schema": {
-            "$ref": "#/backend/entities/UserModuleProgress"
-          },
-          "description": "Tracks a user's detailed progress within a specific module, including the current lesson. The `{userId}` is denormalized in the path, and `{moduleId}` serves as the document ID, ensuring authorization independence and efficient QAPs for user-specific module progress.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The Firebase Authentication User ID (UID) of the user whose module progress is tracked."
-            },
-            {
-              "name": "moduleId",
-              "description": "The unique identifier for the module."
+              "description": "The unique identifier for a TestAttempt."
             }
           ]
         }
@@ -735,11 +808,31 @@
           "schema": {
             "$ref": "#/backend/entities/Roadmap"
           },
-          "description": "Defines structured learning paths. These are globally accessible content, readable by authenticated users, ensuring QAPs and authorization independence.",
+          "description": "Stores definitions for structured learning paths, guiding students through preparation. Read-only for authenticated users.",
           "params": [
             {
               "name": "roadmapId",
-              "description": "The unique identifier for the roadmap."
+              "description": "The unique identifier for a Roadmap."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roadmaps/{roadmapId}/roadmapSteps/{roadmapStepId}",
+        "definition": {
+          "entityName": "RoadmapStep",
+          "schema": {
+            "$ref": "#/backend/entities/RoadmapStep"
+          },
+          "description": "Represents individual steps within a roadmap, linking to specific learning content or courses. Read-only for authenticated users. The `roadmapId` from the parent path is implicitly linked.",
+          "params": [
+            {
+              "name": "roadmapId",
+              "description": "The unique identifier of the parent Roadmap."
+            },
+            {
+              "name": "roadmapStepId",
+              "description": "The unique identifier for a RoadmapStep."
             }
           ]
         }
@@ -751,48 +844,32 @@
           "schema": {
             "$ref": "#/backend/entities/Resource"
           },
-          "description": "Stores supplementary learning resources like templates and cheat sheets. These are globally accessible content, readable by authenticated users, ensuring QAPs and authorization independence.",
+          "description": "Stores details about downloadable resources like resume templates, cheat sheets, and interview guides. Read-only for authenticated users.",
           "params": [
             {
               "name": "resourceId",
-              "description": "The unique identifier for the resource."
+              "description": "The unique identifier for a Resource."
             }
           ]
         }
       },
       {
-        "path": "/contactMessages/{messageId}",
+        "path": "/contactSubmissions/{submissionId}",
         "definition": {
-          "entityName": "ContactMessage",
+          "entityName": "ContactSubmission",
           "schema": {
-            "$ref": "#/backend/entities/ContactMessage"
+            "$ref": "#/backend/entities/ContactSubmission"
           },
-          "description": "Stores messages submitted through the contact form. These messages can be created by any authenticated user and are typically read by platform administrators. Authorization for administrators would be based on an `AdminRole` collection, ensuring authorization independence.",
+          "description": "Stores messages submitted through the website's contact form. Writeable by any authenticated user, readable only by administrators (as defined in the `/admins` collection).",
           "params": [
             {
-              "name": "messageId",
-              "description": "The unique identifier for the contact message."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/roles_admin/{adminUid}",
-        "definition": {
-          "entityName": "AdminRole",
-          "schema": {
-            "$ref": "#/backend/entities/AdminRole"
-          },
-          "description": "An administrative role collection where the existence of a document with the user's UID as its ID grants administrative privileges. This design adheres to DBAC (Database Access Control) and ensures authorization independence by relying on a simple `exists()` check.",
-          "params": [
-            {
-              "name": "adminUid",
-              "description": "The Firebase Authentication User ID (UID) of the administrator."
+              "name": "submissionId",
+              "description": "The unique identifier for a ContactSubmission."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure for PrepStack is designed with paramount focus on Authorization Independence, enabling robust and debuggable security rules, and efficient querying (QAPs).\n\n**Authorization Independence via Denormalization:**\n1.  **User-Owned Data:** For all user-specific data such as `TestAttempt`, `UserCourseProgress`, and `UserModuleProgress`, the design strictly adheres to path-based ownership. Documents are stored in subcollections under `/users/{userId}/`. For example, `/users/{userId}/testAttempts/{testAttemptId}`. This implicitly denormalizes the `userId` into the document path itself. Security rules can then directly compare `request.auth.uid` with the `{userId}` wildcard from the path, eliminating the need for expensive and complex `get()` operations to check ownership in a parent document. Each document within these subcollections also explicitly contains a `userId` field for redundancy and clarity.\n2.  **Global Content:** Core learning content (Courses, Modules, Lessons, Tests, Questions, Roadmaps, Resources) is stored in top-level collections (e.g., `/courses`, `/modules`). These collections are intended to be globally readable by any authenticated user. Since their access control is homogeneous and doesn't depend on attributes of other documents or user-specific permissions (beyond authentication), no denormalization for authorization is needed within these documents. This design simplifies security rules to a simple `allow read: if request.auth.uid != null;` for these collections.\n3.  **Unique User ID:** The custom 10-character alphanumeric `username` (distinct from Firebase UID) is enforced via a dedicated `/usernames/{usernameId}` collection. Uniqueness is checked by attempting to create a document with the desired username as its ID and using a security rule like `allow create: if !exists(/usernames/$(usernameId))`. This ensures uniqueness atomically without `get()` dependencies on the `/users` collection.\n4.  **Admin Roles:** For administrative actions (like reading `contactMessages`), an `AdminRole` is implemented as an existence-based check using `/roles_admin/{adminUid}`. This means checking `exists(/roles_admin/$(request.auth.uid))` in rules, which is an atomic, independent check.\n\n**QAPs (Rules are not Filters):**\n1.  **Global Content Listing:** Top-level collections like `/courses`, `/tests`, `/roadmaps`, `/resources` allow secure and efficient `list` operations. Security rules permit authenticated users to read all documents (`request.auth.uid != null`), ensuring that client-side queries can list all available content without being implicitly filtered by Firestore rules. The rule simply grants access to the entire collection, preventing partial data fetches or rule violations.\n2.  **User-Specific Data Listing:** For collections like `/users/{userId}/testAttempts`, `list` operations are implicitly secured by the path structure. A user can only `list` documents within their own `/users/{request.auth.uid}/testAttempts` subcollection. Any attempt to list data for a different `userId` would be denied by the security rule `request.auth.uid == userId`, thus fulfilling the QAP principle by ensuring that `list` queries only return data the user is authorized to see in its entirety, without server-side filtering applying additional constraints.\n\nThis architecture minimizes rule complexity, prevents common security pitfalls related to hierarchical dependencies, and supports the scalability requirements of a multi-user learning platform by segregating data based on its access patterns."
+    "reasoning": "The Firestore structure for PrepStack is designed with security, scalability, and debuggability as core priorities, strictly adhering to the provided design principles. The approach leverages path-based authorization, structural segregation, and selective denormalization to achieve these goals.\n\n**Authorization Independence (CRITICAL):**\nThis is achieved primarily through the use of **path-based ownership** for all user-specific data. Instead of storing a `userId` field within documents and relying on `get()` calls in security rules to verify ownership against a parent document, all private user data is structured as subcollections directly under the user's document:\n*   `/users/{userId}/learningProgressByModule/{moduleId}`\n*   `/users/{userId}/testAttempts/{testAttemptId}`\n\nIn these paths, the `{userId}` wildcard **must** match the authenticated user's Firebase UID (`request.auth.uid`). This means that security rules can simply check `allow read, write: if request.auth.uid == userId;` without needing to retrieve any parent document, making operations atomic (suitable for transactions/batches) and rules highly performant and easy to debug. The `userId` field within the `LearningProgress` and `TestAttempt` documents, while present according to the schema, serves as internal data consistency and is not primarily relied upon for *authorization* in rules due to the path structure. This completely eliminates hierarchical authorization dependencies.\n\nTo enforce the uniqueness of the `User.userId` (the 10-character alphanumeric ID), a dedicated lookup collection, `/customUserIds/{customUserId}`, is introduced. A user attempting to sign up would first create a document in this collection with their chosen `customUserId` as the document ID. Rules can ensure this `customUserId` does not already exist using `!exists()`, thereby maintaining global uniqueness without complex queries or `get()` calls on potentially large `users` collection documents.\n\n**QAPs (Rules are not Filters):**\nThis design ensures Queryability for Authorized Paths (QAPs) by categorizing data into two primary security postures:\n\n1.  **Global, Read-Only Collections for Authenticated Users:** Collections like `/courses`, `/tests`, `/questions`, `/roadmaps`, and `/resources` (and their subcollections like `/courses/{courseId}/modules`) store public, curriculum-related content. These collections are structured to be entirely readable by *any* authenticated user. This means that a `list` query on `/courses` will return *all* courses, not a filtered subset, satisfying the QAP principle as no server-side filtering is required by security rules. Access is uniformly granted to all logged-in students.\n\n2.  **User-Scoped Collections for Private Data:** Collections like `/users/{userId}/learningProgressByModule` and `/users/{userId}/testAttempts` are inherently user-specific. Any `list` query on these subcollections, e.g., `db.collection('users').doc(uid).collection('learningProgressByModule').get()`, will automatically be scoped to the authenticated user's ID (`uid`). The security rules enforce that `userId` in the path must match `request.auth.uid`. This effectively means that `list` operations implicitly return data relevant *only* to the authorized user, perfectly aligning with QAP as no additional filtering logic is needed in rules to prevent data leakage.\n\n**Structural Segregation:**\n*   Core `User` profiles are in `/users/{userId}`.\n*   Global, static learning content is segregated into top-level collections like `/courses`, `/tests`, `/questions`, `/roadmaps`, and `/resources`. These collections have homogeneous security requirements (read-only for all authenticated users).\n*   User-specific progress and attempt data is segregated into subcollections under the user's UID path, ensuring distinct security postures (owner-only access).\n*   `ContactSubmission` is a write-only collection for users, readable only by `admins` (a separate `admins` collection provides DBAC for this role).\n\n**Access Modeling:**\n*   **Private Data:** Implemented via `/users/{userId}` for user profiles and `/users/{userId}/...` for private subcollections.\n*   **Hierarchical Paths for User-Owned Data:** Fully utilized for `learningProgressByModule` and `testAttempts` under `/users/{userId}`.\n*   **Global Roles (DBAC):** The `/admins/{userId}` collection is used for role-based access control, allowing administrators specific permissions (e.g., reading contact submissions).\n\nThis architecture prioritizes clear ownership, eliminates `get()` calls in rules, and enables efficient, secure querying, making the system scalable and highly debuggable."
   }
 }

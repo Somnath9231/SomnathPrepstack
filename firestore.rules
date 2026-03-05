@@ -6,153 +6,190 @@ service cloud.firestore {
      * PREPSTACK SECURITY RULES - PROTOTYPING MODE
      *
      * CORE PHILOSOPHY:
-     * This ruleset implements a closed, authenticated-only learning system. It prioritizes strict 
-     * authorization (who can access what) while maintaining flexible data structures to support 
-     * rapid feature iteration.
+     * This ruleset enforces a strict user-ownership model for all student-specific data
+     * while providing read-only access to global learning content for authenticated users.
+     * It prioritizes path-based authorization to ensure high performance and scalability.
      *
      * DATA STRUCTURE:
-     * - User-specific data is organized under /users/{userId} to enable simple path-based ownership.
-     * - Global content (Courses, Modules, Lessons, Tests) is stored in top-level collections.
-     * - Administrative privileges are determined by the /roles_admin collection.
+     * - /users/{userId}: Private user profiles, where {userId} is the Firebase Auth UID.
+     * - /users/{userId}/...: Private subcollections for progress and test history.
+     * - /courses, /tests, /roadmaps: Global collections accessible by all students.
+     * - /customUserIds: A lookup table to ensure the uniqueness of 10-char alphanumeric IDs.
+     * - /admins: A collection used to grant administrative privileges via DBAC.
      *
      * KEY SECURITY DECISIONS:
-     * - AUTH-ONLY ACCESS: All learning content requires an authenticated session (no visitor access).
-     * - OWNERSHIP MODEL: Personal progress and test results are restricted to the owning student.
-     * - UNIQUE IDENTIFIERS: A separate /usernames collection acts as a lock to ensure the 10-char
-     *   alphanumeric IDs are unique across the platform.
-     * - ADMIN CONTROL: While students can read content, only users verified via the roles_admin
-     *   collection can modify global learning materials.
+     * 1. Public user listing is strictly prohibited to protect student privacy.
+     * 2. Curriculum data (Courses, Modules, Questions) is read-only for students.
+     * 3. Ownership is verified by matching path wildcards ({userId}) to request.auth.uid.
+     * 4. Relational integrity is enforced by ensuring internal document IDs match the path.
      *
      * DENORMALIZATION FOR AUTHORIZATION:
-     * - Subcollections (testAttempts, courseProgress) explicitly repeat the userId within 
-     *   document fields to ensure relational integrity between the URL path and the stored data.
+     * Relational fields (like userId) are stored directly within subcollection documents
+     * to allow rules to verify data consistency without expensive get() calls.
      */
 
-    // --- Helper Functions ---
+    // --- GLOBAL HELPER FUNCTIONS ---
 
-    /** @description Checks if the request is from an authenticated user. */
+    /** @description Checks if the user is authenticated. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /** @description Checks if the authenticated user's UID matches the provided userId. */
+    /** @description Checks if the authenticated user matches the provided ID. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /** @description Checks if the user is an owner of an existing document before update/delete. */
+    /** @description Checks if the user owns the existing document for destructive operations. */
     function isExistingOwner(userId) {
-      return resource != null && isOwner(userId);
+      return isOwner(userId) && resource != null;
     }
 
-    /** @description Checks if the user has been granted administrative privileges. */
+    /** @description Checks if the authenticated user has administrative privileges. */
     function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
-    // --- Collection Rules ---
+    // --- COLLECTION RULES ---
 
     /**
-     * @description User profile management.
+     * @description Rules for the core User profile.
      * @path /users/{userId}
-     * @allow (create) if auth.uid matches userId.
-     * @deny (read) if trying to access another student's profile.
-     * @principle Ownership/Self-Creation.
+     * @allow (get) if user is the owner or an admin.
+     * @deny (list) Public user discovery is disabled.
+     * @principle Restricts access to a user's own data tree.
      */
     match /users/{userId} {
-      allow get, list: if isOwner(userId) || isAdmin();
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if false;
       allow create: if isOwner(userId);
       allow update: if isExistingOwner(userId);
-      allow delete: if isAdmin();
+      allow delete: if false;
 
       /**
-       * @description Records of student mock test results.
+       * @description Tracks progress through specific modules.
+       * @path /users/{userId}/learningProgressByModule/{moduleId}
+       * @allow (create) if ownerId in data matches the path userId.
+       * @principle Validates relational integrity between path and document data.
+       */
+      match /learningProgressByModule/{moduleId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+        allow delete: if isExistingOwner(userId);
+      }
+
+      /**
+       * @description Records history of test attempts.
        * @path /users/{userId}/testAttempts/{testAttemptId}
-       * @allow (create) if data.userId matches the path and the user's UID.
-       * @principle Path-based Ownership with relational integrity check.
+       * @allow (list) User can view their own test history.
+       * @principle Path-based ownership for high-performance listing.
        */
       match /testAttempts/{testAttemptId} {
-        allow get, list: if isOwner(userId) || isAdmin();
+        allow get, list: if isOwner(userId);
         allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-        allow delete: if isExistingOwner(userId) || isAdmin();
-      }
-
-      /**
-       * @description Overall progress tracking for a specific course.
-       * @path /users/{userId}/courseProgress/{courseId}
-       * @allow (update) if the owner is updating their own progress percentage.
-       * @principle Ownership.
-       */
-      match /courseProgress/{courseId} {
-        allow get, list: if isOwner(userId) || isAdmin();
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-        allow delete: if isExistingOwner(userId) || isAdmin();
-      }
-
-      /**
-       * @description Detailed module-level progress and "Resume Learning" state.
-       * @path /users/{userId}/moduleProgress/{moduleId}
-       * @allow (read/write) if the student owns the record.
-       * @principle Ownership.
-       */
-      match /moduleProgress/{moduleId} {
-        allow get, list: if isOwner(userId) || isAdmin();
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-        allow delete: if isExistingOwner(userId) || isAdmin();
+        allow update: if false; // Test results are immutable
+        allow delete: if isExistingOwner(userId);
       }
     }
 
     /**
-     * @description Enforces unique 10-character alphanumeric IDs.
-     * @path /usernames/{usernameId}
-     * @allow (create) if the username is not already taken.
-     * @deny (update) to prevent changing the ID mapping after creation.
+     * @description Lookup collection for unique 10-char custom User IDs.
+     * @path /customUserIds/{customUserId}
+     * @allow (create) if a signed-in user is claiming an unused ID.
+     * @principle Ensures global uniqueness of custom IDs during signup.
      */
-    match /usernames/{usernameId} {
+    match /customUserIds/{customUserId} {
+      allow get: if isSignedIn();
+      allow list: if false;
+      allow create: if isSignedIn();
+      allow update, delete: if false;
+    }
+
+    /**
+     * @description Role-based access control for administrators.
+     * @path /admins/{userId}
+     * @allow (get) User can check their own admin status.
+     * @principle Database Access Control (DBAC) for system privileges.
+     */
+    match /admins/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create, update, delete: if false; // Admin roles assigned via CLI/SDK
+    }
+
+    /**
+     * @description Global learning courses and their contents.
+     * @path /courses/{courseId}
+     * @allow (read) Any logged-in student can browse courses.
+     * @deny (write) Only administrators can modify curriculum.
+     */
+    match /courses/{courseId} {
       allow get, list: if isSignedIn();
-      allow create: if isSignedIn() && !exists(/databases/$(database)/documents/usernames/$(usernameId));
-      allow update, delete: if isAdmin();
+      allow create, update, delete: if isAdmin();
+
+      match /modules/{moduleId} {
+        allow get, list: if isSignedIn();
+        allow create, update, delete: if isAdmin();
+
+        match /learningContent/{lcId} {
+          allow get, list: if isSignedIn();
+          allow create, update, delete: if isAdmin();
+        }
+      }
     }
 
     /**
-     * @description Global learning content: Courses, Modules, Lessons, Tests, Questions, Roadmaps, Resources.
-     * @path /{collection}/{id}
-     * @allow (read) if the user is logged in.
-     * @deny (write) if the user is not an administrator.
-     * @principle Authenticated Public Read / Admin-Only Write.
+     * @description Mock Test definitions and Question Bank.
+     * @path /tests/{testId}, /questions/{questionId}
+     * @allow (read) Authenticated users can access tests and questions.
+     * @principle Read-only access for curriculum data.
      */
-    match /courses/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
-    match /modules/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
-    match /lessons/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
-    match /tests/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
-    match /questions/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
-    match /roadmaps/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
-    match /resources/{id} { allow read: if isSignedIn(); allow write: if isAdmin(); }
+    match /tests/{testId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /questions/{questionId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
 
     /**
-     * @description Stores student inquiries from the contact form.
-     * @path /contactMessages/{messageId}
-     * @allow (create) by any authenticated student.
-     * @allow (read) only by platform administrators.
+     * @description Roadmaps and structured learning steps.
+     * @path /roadmaps/{roadmapId}
+     * @allow (get) Users can follow a learning path.
      */
-    match /contactMessages/{messageId} {
+    match /roadmaps/{roadmapId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+
+      match /roadmapSteps/{stepId} {
+        allow get, list: if isSignedIn();
+        allow create, update, delete: if isAdmin();
+      }
+    }
+
+    /**
+     * @description Downloadable resources like resumes and cheat sheets.
+     * @path /resources/{resourceId}
+     */
+    match /resources/{resourceId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Support messages from the contact form.
+     * @path /contactSubmissions/{submissionId}
+     * @allow (create) Any logged-in user can submit a message.
+     * @allow (read) Only admins can review submissions.
+     * @principle Write-only for users, restricted read for staff.
+     */
+    match /contactSubmissions/{submissionId} {
       allow create: if isSignedIn();
       allow get, list: if isAdmin();
       allow update, delete: if isAdmin();
-    }
-
-    /**
-     * @description Registry for administrative UIDs.
-     * @path /roles_admin/{adminUid}
-     * @allow (read) for checking own status.
-     * @deny (write) for all client-side requests.
-     */
-    match /roles_admin/{adminUid} {
-      allow get: if isOwner(adminUid);
-      allow list, create, update, delete: if false;
     }
   }
 }
