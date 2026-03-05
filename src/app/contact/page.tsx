@@ -7,20 +7,32 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Send, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useFirestore } from "@/firebase";
+import { collection, serverTimestamp } from "firebase/firestore";
+import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export default function ContactPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
+  const db = useFirestore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate Firebase Firestore Save
+
+    const submissionRef = collection(db, "contact_submissions");
+    addDocumentNonBlocking(submissionRef, {
+      ...formData,
+      submissionDate: serverTimestamp()
+    });
+
+    // We don't wait for Firestore to finish to improve UX
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
       toast({ title: "Message sent successfully!", description: "We'll get back to you soon." });
-    }, 1500);
+    }, 800);
   };
 
   return (
@@ -80,20 +92,49 @@ export default function ContactPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" required placeholder="John Doe" className="glass h-12" />
+                  <Input 
+                    id="name" 
+                    required 
+                    placeholder="John Doe" 
+                    className="glass h-12" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" required placeholder="john@example.com" className="glass h-12" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    required 
+                    placeholder="john@example.com" 
+                    className="glass h-12" 
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="subject">Subject</Label>
-                <Input id="subject" required placeholder="How can we help?" className="glass h-12" />
+                <Input 
+                  id="subject" 
+                  required 
+                  placeholder="How can we help?" 
+                  className="glass h-12" 
+                  value={formData.subject}
+                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="message">Message</Label>
-                <Textarea id="message" required placeholder="Type your message here..." className="glass min-h-[150px]" />
+                <Textarea 
+                  id="message" 
+                  required 
+                  placeholder="Type your message here..." 
+                  className="glass min-h-[150px]" 
+                  value={formData.message}
+                  onChange={(e) => setFormData({...formData, message: e.target.value})}
+                />
               </div>
               <GlowButton type="submit" size="lg" className="w-full" disabled={loading}>
                 {loading ? "Sending..." : "Send Message"} <Send className="w-4 h-4 ml-2" />

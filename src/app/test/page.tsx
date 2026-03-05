@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -6,6 +5,10 @@ import { GlowButton } from "@/components/GlowButton";
 import { Progress } from "@/components/ui/progress";
 import { Brain, Clock, ChevronLeft, ChevronRight, CheckCircle2, ShieldCheck, Trophy, Target, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUser, useFirestore } from "@/firebase";
+import { collection, doc, serverTimestamp } from "firebase/firestore";
+import { addDocumentNonBlocking } from "@/firebase/non-blocking-updates";
+import { toast } from "@/hooks/use-toast";
 
 const domains = ["Quantitative Aptitude", "Logical Reasoning", "Verbal Ability", "Data Interpretation", "Programming", "Computer Science Core"];
 
@@ -38,15 +41,37 @@ export default function TestPage() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [timeLeft, setTimeLeft] = useState(1200); // 20 mins
+  const { user } = useUser();
+  const db = useFirestore();
 
   useEffect(() => {
     if (step === "test" && timeLeft > 0) {
       const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
       return () => clearInterval(timer);
     } else if (step === "test" && timeLeft === 0) {
-      setStep("result");
+      handleFinish();
     }
   }, [step, timeLeft]);
+
+  const handleFinish = () => {
+    const results = calculateResults();
+    if (user) {
+      const attemptsRef = collection(db, "users", user.uid, "test_attempts");
+      addDocumentNonBlocking(attemptsRef, {
+        userId: user.uid,
+        testDomain: currentDomain,
+        score: results.score,
+        totalQuestions: mockQuestions.length,
+        correctAnswers: results.score,
+        wrongAnswers: results.attempted - results.score,
+        attemptPercentage: (results.attempted / mockQuestions.length) * 100,
+        accuracyPercentage: results.accuracy,
+        attemptDate: serverTimestamp(),
+        durationTakenSeconds: 1200 - timeLeft
+      });
+    }
+    setStep("result");
+  };
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -158,7 +183,7 @@ export default function TestPage() {
           </GlowButton>
           
           {currentQuestion === mockQuestions.length - 1 ? (
-            <GlowButton onClick={() => setStep("result")} variant="secondary" className="flex-1 md:flex-none px-6 md:px-10 py-5 md:py-7">Finish Exam</GlowButton>
+            <GlowButton onClick={handleFinish} variant="secondary" className="flex-1 md:flex-none px-6 md:px-10 py-5 md:py-7">Finish Exam</GlowButton>
           ) : (
             <GlowButton onClick={() => setCurrentQuestion(prev => prev + 1)} className="flex-1 md:flex-none px-6 md:px-10 py-5 md:py-7">
               Next <ChevronRight className="w-4 h-4 md:w-5 md:h-5 ml-1 md:ml-2" />

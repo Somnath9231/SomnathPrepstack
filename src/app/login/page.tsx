@@ -4,24 +4,40 @@ import { useState } from "react";
 import { GlowButton } from "@/components/GlowButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/firebase";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useAuth, useFirestore } from "@/firebase";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, User } from "firebase/auth";
+import { doc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
-import { LogIn, ShieldCheck, Mail } from "lucide-react";
+import { LogIn, ShieldCheck } from "lucide-react";
+import { setDocumentNonBlocking } from "@/firebase/non-blocking-updates";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const auth = useAuth();
+  const db = useFirestore();
   const router = useRouter();
+
+  const syncUserProfile = (user: User) => {
+    const userRef = doc(db, "users", user.uid);
+    setDocumentNonBlocking(userRef, {
+      id: user.uid,
+      email: user.email,
+      name: user.displayName || email.split('@')[0],
+      lastLoginAt: serverTimestamp(),
+      createdAt: serverTimestamp(), // Firestore security rules will handle merge vs create
+      enrollmentStatus: "free"
+    }, { merge: true });
+  };
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      syncUserProfile(result.user);
       toast({ title: "Welcome Back!", description: "Successfully logged into PrepStack." });
       router.push("/dashboard");
     } catch (error: any) {
@@ -34,7 +50,8 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      syncUserProfile(result.user);
       toast({ title: "Welcome!", description: "Successfully logged in with Google." });
       router.push("/dashboard");
     } catch (error: any) {
