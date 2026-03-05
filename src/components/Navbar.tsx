@@ -66,17 +66,17 @@ export function Navbar() {
                 user ? (
                   <div className="flex items-center gap-4">
                     <Link href="/dashboard">
-                      <GlowButton variant="outline" size="sm" className="gap-2">
+                      <GlowButton variant="outline" size="sm" className="gap-2" suppressHydrationWarning>
                         <UserCircle className="w-4 h-4" /> Dashboard
                       </GlowButton>
                     </Link>
-                    <button onClick={handleSignOut} className="text-muted-foreground hover:text-secondary transition-colors p-2">
+                    <button onClick={handleSignOut} className="text-muted-foreground hover:text-secondary transition-colors p-2" suppressHydrationWarning>
                       <LogOut className="w-5 h-5" />
                     </button>
                   </div>
                 ) : (
                   <Link href="/login">
-                    <GlowButton size="sm" variant="secondary" className="gap-2">
+                    <GlowButton size="sm" variant="secondary" className="gap-2" suppressHydrationWarning>
                       <LogIn className="w-4 h-4" /> Sign In
                     </GlowButton>
                   </Link>
@@ -87,7 +87,10 @@ export function Navbar() {
             {/* Mobile Nav Toggle */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <button className="lg:hidden p-2 text-muted-foreground hover:text-primary transition-all">
+                <button 
+                  className="lg:hidden p-2 text-muted-foreground hover:text-primary transition-all"
+                  suppressHydrationWarning
+                >
                   <Menu className="w-6 h-6" />
                 </button>
               </SheetTrigger>
@@ -116,7 +119,7 @@ export function Navbar() {
                       user ? (
                         <>
                           <Link href="/dashboard" onClick={() => setIsOpen(false)}>
-                            <GlowButton variant="outline" className="w-full justify-start gap-3">
+                            <GlowButton variant="outline" className="w-full justify-start gap-3" suppressHydrationWarning>
                               <UserCircle className="w-5 h-5" /> Dashboard
                             </GlowButton>
                           </Link>
@@ -124,13 +127,14 @@ export function Navbar() {
                             variant="secondary" 
                             className="w-full justify-start gap-3"
                             onClick={() => { handleSignOut(); setIsOpen(false); }}
+                            suppressHydrationWarning
                           >
                             <LogOut className="w-5 h-5" /> Logout Protocol
                           </GlowButton>
                         </>
                       ) : (
                         <Link href="/login" onClick={() => setIsOpen(false)}>
-                          <GlowButton variant="secondary" className="w-full justify-start gap-3">
+                          <GlowButton variant="secondary" className="w-full justify-start gap-3" suppressHydrationWarning>
                             <LogIn className="w-5 h-5" /> Login Protocol
                           </GlowButton>
                         </Link>

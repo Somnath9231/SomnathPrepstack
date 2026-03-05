@@ -76,6 +76,7 @@ export default function LoginPage() {
             variant="outline" 
             className="w-full py-6 flex gap-3 normal-case tracking-normal"
             onClick={handleGoogleLogin}
+            suppressHydrationWarning
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -102,6 +103,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                suppressHydrationWarning
               />
             </div>
             <div className="space-y-2">
@@ -113,9 +115,10 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                suppressHydrationWarning
               />
             </div>
-            <GlowButton type="submit" className="w-full py-6" disabled={loading}>
+            <GlowButton type="submit" className="w-full py-6" disabled={loading} suppressHydrationWarning>
               {loading ? "Authenticating..." : "Login Protocol"} <LogIn className="w-4 h-4 ml-2" />
             </GlowButton>
           </form>

@@ -19,7 +19,7 @@ export function Footer() {
             <Link href="/" className="text-4xl font-black tracking-tighter text-neon-cyan group inline-block">
               PREPSTACK
             </Link>
-            <p className="text-muted-foreground text-lg max-w-sm font-medium leading-relaxed">
+            <p className="text-muted-foreground text-lg max-sm font-medium leading-relaxed">
               Industrial preparation reimagined. We build technical excellence through deep learning and real-time simulation protocols.
             </p>
             <div className="flex gap-6">
