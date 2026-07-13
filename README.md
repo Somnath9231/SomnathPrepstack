@@ -1,6 +1,7 @@
 # PREPSTACK
 
 **PREPSTACK** is a high-octane, industrial-grade placement preparation platform designed to bridge the gap between college education and career success. Built with a focus on deep learning, real-time simulation, and personalized mentorship.
+Version 2
 
 ## 🚀 Repository
 [GitHub Repository](https://github.com/Somnath9231/SomnathPrepstack.git)
