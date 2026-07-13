@@ -15,6 +15,7 @@ const navLinks = [
   { name: "Roadmaps", href: "/roadmaps" },
   { name: "Practice", href: "/practice" },
   { name: "Languages", href: "/languages" },
+  { name: "One Shots", href: "/one-shots" },
   { name: "Enroll", href: "/enroll" },
   { name: "Test", href: "/test" },
   { name: "About", href: "/about" },

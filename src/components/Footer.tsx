@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -46,6 +45,7 @@ export function Footer() {
             <ul className="space-y-6 text-sm font-bold text-muted-foreground">
               <li><Link href="/roadmaps" className="hover:text-primary transition-colors">Roadmaps</Link></li>
               <li><Link href="/practice" className="hover:text-primary transition-colors">Practice</Link></li>
+              <li><Link href="/one-shots" className="hover:text-primary transition-colors">One Shots</Link></li>
               <li><Link href="/test" className="hover:text-primary transition-colors">Exam Engine</Link></li>
               <li><Link href="/resources" className="hover:text-primary transition-colors">Assets</Link></li>
             </ul>
@@ -68,14 +68,14 @@ export function Footer() {
             <div className="space-y-3">
               <h5 className="text-lg font-black text-primary uppercase tracking-widest">Platform Disclaimer</h5>
               <p className="text-sm font-bold text-muted-foreground leading-relaxed">
-                PrepStack is a high-fidelity educational demonstration platform. This entire project—including the core concept, structure, and design—was originally conceived and architected by <strong>Somnath Podder</strong>. The code has been developed and optimized with the assistance of advanced AI technologies, including ChatGPT, Gemini, Firebase Studio, and more.
+                PrepStack is a high-fidelity educational demonstration platform. This entire project—including the core concept, structure, and design—was originally conceived and architected by <strong>Somnath Podder</strong>. The code has been developed and optimized with the assistance of advanced AI technologies.
               </p>
             </div>
           </div>
         </div>
 
         <div className="border-t border-white/5 pt-12 text-center text-sm font-black text-muted-foreground uppercase tracking-[0.3em]">
-          <p>© {year || '2025'} PREPSTACK. Developed by Somnath Podder.</p>
+          <p suppressHydrationWarning>© {year || '2025'} PREPSTACK. Developed by Somnath Podder.</p>
         </div>
       </div>
     </footer>
