@@ -1,8 +1,13 @@
+
 import { GraduationCap, Target, Users, Code2 } from "lucide-react";
 import { GlowButton } from "@/components/GlowButton";
 import Link from "next/link";
+import Image from "next/image";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function AboutPage() {
+  const founderImage = PlaceHolderImages.find(img => img.id === 'founder-image');
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-24 space-y-24">
       {/* Hero Section */}
@@ -71,8 +76,17 @@ export default function AboutPage() {
           </div>
           <div className="relative group perspective-1000 hidden lg:block">
             <div className="absolute -inset-4 bg-primary/20 blur-2xl group-hover:bg-primary/30 transition-all rounded-full" />
-            <div className="relative aspect-square glass rounded-full overflow-hidden border-2 border-primary/20 p-12 flex items-center justify-center animate-float-3d">
-               <Code2 className="w-48 h-48 text-primary/40" />
+            <div className="relative aspect-square glass rounded-[3rem] overflow-hidden border-2 border-primary/20 p-4 flex items-center justify-center animate-float-3d">
+               <div className="relative w-full h-full rounded-2xl overflow-hidden">
+                 <Image 
+                   src={founderImage?.imageUrl || ""} 
+                   alt="Somnath Podder" 
+                   fill 
+                   className="object-cover group-hover:scale-110 transition-transform duration-700"
+                   data-ai-hint={founderImage?.imageHint}
+                 />
+                 <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
+               </div>
             </div>
           </div>
         </div>

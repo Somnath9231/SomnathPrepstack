@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -40,7 +41,7 @@ export default function ContactPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
         <div className="space-y-12">
           <div className="space-y-6">
-            <h1 className="text-5xl font-bold font-headline">Get in <span className="text-neon-blue">Touch</span></h1>
+            <h1 className="text-5xl font-bold font-headline">Get in <span className="text-neon-cyan">Touch</span></h1>
             <p className="text-muted-foreground text-lg leading-relaxed max-w-md">
               Have questions about your placement preparation? Our team is here to help you navigate your career journey.
             </p>
@@ -62,7 +63,7 @@ export default function ContactPage() {
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Call Us</div>
-                <div className="font-bold">+91 98765 43210</div>
+                <div className="font-bold">+91 9231XXXXX9</div>
               </div>
             </div>
             <div className="flex items-center gap-6 group">
