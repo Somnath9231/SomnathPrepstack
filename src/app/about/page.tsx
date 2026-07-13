@@ -1,4 +1,6 @@
 
+"use client";
+
 import { GraduationCap, Target, Users, Code2 } from "lucide-react";
 import { GlowButton } from "@/components/GlowButton";
 import Link from "next/link";
@@ -78,7 +80,7 @@ export default function AboutPage() {
             <div className="absolute -inset-4 bg-primary/20 blur-2xl group-hover:bg-primary/30 transition-all rounded-full" />
             <div className="relative aspect-square glass rounded-[3rem] overflow-hidden border-2 border-primary/20 p-4 flex items-center justify-center animate-float-3d">
                <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                 {founderImage?.imageUrl && (
+                 {founderImage?.imageUrl ? (
                    <Image 
                      src={founderImage.imageUrl} 
                      alt="Somnath Podder" 
@@ -86,6 +88,10 @@ export default function AboutPage() {
                      className="object-cover group-hover:scale-110 transition-transform duration-700"
                      data-ai-hint={founderImage.imageHint}
                    />
+                 ) : (
+                   <div className="w-full h-full bg-primary/5 flex items-center justify-center text-primary/40 font-black uppercase tracking-widest text-[10px]">
+                     Loading Sequence...
+                   </div>
                  )}
                  <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
                </div>
