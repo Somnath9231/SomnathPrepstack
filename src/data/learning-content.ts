@@ -120,52 +120,57 @@ export const learningContent: Record<string, CourseContent> = {
       }
     ]
   },
-  python: {
-    title: "Python for Industrial Tech",
-    description: "From scripting basics to advanced enterprise-level development.",
+  marketing: {
+    title: "Digital Marketing Excellence",
+    description: "Master the art of industrial growth and digital customer acquisition.",
     modules: [
       {
         id: "m1",
-        title: "Module 1: Core Fundamentals",
-        description: "Variables, Loops, and Data Types.",
+        title: "Module 1: Marketing Fundamentals",
+        description: "Core principles of the 4Ps and consumer behavior.",
         sections: [
           {
-            subtitle: "Pythonic Logic",
-            content: "Python emphasizes readability. Variables are dynamically typed, making it the perfect starting point for developers.",
-            code: "name = 'PrepStack'\nprint(f'Hello {name}')"
+            subtitle: "The Marketing Mix",
+            content: "Product, Price, Place, and Promotion. These are the pillars of any successful market entry strategy.",
           }
         ]
       },
       {
         id: "m2",
-        title: "Module 2: Functional & OOP Python",
-        description: "Mastering Functions and Class-based design.",
+        title: "Module 2: Digital Channels",
+        description: "SEO, SEM, and Social Media strategies.",
         sections: [
           {
-            subtitle: "Decorators and Generators",
-            content: "Advanced Pythonic features that allow for powerful function wrapping and memory-efficient iteration.",
+            subtitle: "SEO Protocol",
+            content: "Search Engine Optimization is about visibility without paid ads. Focus on E-E-A-T: Experience, Expertise, Authoritativeness, and Trust.",
+          }
+        ]
+      }
+    ]
+  },
+  finance: {
+    title: "Corporate Finance & Analysis",
+    description: "Deep dive into financial modeling and capital management.",
+    modules: [
+      {
+        id: "m1",
+        title: "Module 1: Financial Accounting",
+        description: "Mastering the three core financial statements.",
+        sections: [
+          {
+            subtitle: "The Balance Sheet",
+            content: "A snapshot of a company's financial health. Assets = Liabilities + Equity.",
           }
         ]
       },
       {
-        id: "m3",
-        title: "Module 3: Data Science Libraries",
-        description: "NumPy, Pandas, and Scikit-Learn.",
+        id: "m2",
+        title: "Module 2: Investment Analysis",
+        description: "NPV, IRR, and risk assessment.",
         sections: [
           {
-            subtitle: "Data Manipulation",
-            content: "Learn how to process millions of rows of data with vectorized operations in Pandas.",
-          }
-        ]
-      },
-      {
-        id: "m4",
-        title: "Module 4: Enterprise Projects",
-        description: "API development and Backend Architecture.",
-        sections: [
-          {
-            subtitle: "Flask & FastAPI",
-            content: "Building high-performance REST APIs for modern web applications.",
+            subtitle: "Net Present Value",
+            content: "Calculating the value of future cash flows in today's terms. The fundamental tool for decision making.",
           }
         ]
       }

@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GlowButton } from "@/components/GlowButton";
-import { Code2, Brain, MessageSquare, Terminal, Database, Globe, Network, Cpu, FileCheck, ShieldAlert, ArrowRight, Loader2 } from "lucide-react";
+import { Code2, Brain, MessageSquare, Terminal, Database, Globe, Network, Cpu, FileCheck, ShieldAlert, ArrowRight, Loader2, TrendingUp, DollarSign } from "lucide-react";
 import { useUser } from "@/firebase";
 
 const techModules = [
@@ -16,16 +16,16 @@ const techModules = [
   { slug: "system-design", name: "System Design", icon: <Globe />, topics: ["Load Balancing", "Caching", "Sharding"] },
 ];
 
-const nonTechModules = [
+const bbaModules = [
+  { slug: "marketing", name: "Marketing", icon: <TrendingUp />, topics: ["Brand Strategy", "SEO/SEM", "Consumer Behavior"] },
+  { slug: "finance", name: "Finance", icon: <DollarSign />, topics: ["Asset Valuation", "Risk Analysis", "Portfolio Management"] },
   { slug: "aptitude", name: "Aptitude", icon: <Brain />, topics: ["Quant", "Reasoning", "Data Interpretation"] },
-  { slug: "verbal", name: "Verbal Ability", icon: <MessageSquare />, topics: ["Grammar", "Reading", "Vocabulary"] },
-  { slug: "interview-prep", name: "Interview Prep", icon: <FileCheck />, topics: ["HR Prep", "Common Questions", "Etiquette"] },
 ];
 
 export default function PracticePage() {
   const { user, isUserLoading } = useUser();
 
-  if (isUserLoading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-12 h-12 animate-spin text-primary" /></div>;
+  if (isUserLoading) return <div className="min-h-screen flex items-center justify-center text-primary">SYNCING...</div>;
 
   if (!user) {
     return (
@@ -52,8 +52,8 @@ export default function PracticePage() {
       <Tabs defaultValue="tech" className="w-full">
         <div className="flex justify-center mb-16">
           <TabsList className="glass p-2 h-16 rounded-full">
-            <TabsTrigger value="tech" className="rounded-full px-12 h-full text-sm font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>Technical Streams</TabsTrigger>
-            <TabsTrigger value="general" className="rounded-full px-12 h-full text-sm font-black uppercase tracking-widest data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground" suppressHydrationWarning>Foundations</TabsTrigger>
+            <TabsTrigger value="tech" className="rounded-full px-12 h-full text-sm font-black uppercase tracking-widest data-[state=active]:bg-primary data-[state=active]:text-primary-foreground" suppressHydrationWarning>Tech (B.TECH/BCA)</TabsTrigger>
+            <TabsTrigger value="mgmt" className="rounded-full px-12 h-full text-sm font-black uppercase tracking-widest data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground" suppressHydrationWarning>Business (BBA)</TabsTrigger>
           </TabsList>
         </div>
 
@@ -81,8 +81,8 @@ export default function PracticePage() {
           ))}
         </TabsContent>
 
-        <TabsContent value="general" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-          {nonTechModules.map((module, i) => (
+        <TabsContent value="mgmt" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {bbaModules.map((module, i) => (
             <div key={i} className="glass-card p-10 rounded-[3rem] group hover:border-secondary/50 transition-all duration-500 hover:-translate-y-2 flex flex-col h-full">
               <div className="p-5 bg-secondary/10 rounded-2xl w-fit mb-8 text-secondary group-hover:scale-110 transition-all">
                 {module.icon}
