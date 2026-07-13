@@ -7,11 +7,12 @@
 
 ## 🛠️ Core Features
 
-- **Unique ID Authentication**: Secure protocol using custom 10-character alphanumeric IDs (No Google Auth required).
-- **Professor-Level Learning Modules**: Structured deep dives into DSA, Algorithms, DBMS, OS, Networking, and System Design.
+- **Unique ID Authentication**: Secure protocol using custom 10-character alphanumeric IDs. No Google Auth required. Ensures global uniqueness through a reserved ID system.
+- **Professor-Level Learning Modules**: Structured deep dives into DSA, Algorithms, DBMS, OS, Networking, and System Design, as well as BBA streams like Marketing and Finance.
 - **20/20 Mock Test Engine**: Rigorous 20-minute simulations with 20 randomized questions per attempt.
-- **Dynamic Learning Roadmaps**: Personalized industrial paths for B.Tech, BCA, and Non-Tech students.
-- **Real-Time Student Dashboard**: Centralized hub tracking precision, accuracy, and course completion.
+- **Industrial Roadmaps**: Static, step-by-step guidance for B.Tech, BCA, and BBA students.
+- **Real-Time Student Dashboard**: Centralized hub tracking precision, accuracy, and course completion with Recharts visualization.
+- **Open Source One Shots**: Curated high-intensity video learning sessions.
 - **Mobile Optimized**: Fully responsive interface designed for industrial prep on any device.
 
 ## 🛠️ Tech Stack
@@ -20,7 +21,7 @@
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **UI Components**: [Shadcn UI](https://ui.shadcn.com/)
 - **Backend/Auth**: [Firebase](https://firebase.google.com/)
-- **AI**: [Genkit](https://github.com/firebase/genkit) for personalized roadmap generation.
+- **AI**: [Genkit](https://github.com/firebase/genkit) for intelligent resource recommendations.
 
 ## 🚀 How to Deploy (Step-by-Step)
 

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { GraduationCap, Target, Users } from "lucide-react";
