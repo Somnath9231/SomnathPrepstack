@@ -9,16 +9,22 @@ import {
   DegreeRoadmap, 
   CareerPath 
 } from "@/data/roadmaps";
-import { Map, Target, Award, ShieldAlert, GraduationCap, ArrowRight, Search, BookOpen } from "lucide-react";
-import { useUser } from "@/firebase";
+import { Map, Target, Award, ShieldAlert, GraduationCap, ArrowRight, Search, BookOpen, Rocket, CheckCircle2, Loader2 } from "lucide-react";
+import { useUser, useFirestore } from "@/firebase";
+import { doc, updateDoc } from "firebase/firestore";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 export default function RoadmapsPage() {
   const { user, isUserLoading } = useUser();
+  const db = useFirestore();
+  const router = useRouter();
   const [selectedDegree, setSelectedDegree] = useState<DegreeRoadmap | null>(null);
   const [selectedPath, setSelectedPath] = useState<CareerPath | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isActivating, setIsActivating] = useState(false);
 
   if (isUserLoading) return <div className="min-h-screen flex items-center justify-center text-primary">SYNCING...</div>;
 
@@ -36,6 +42,39 @@ export default function RoadmapsPage() {
       </div>
     );
   }
+
+  const handleStartLearning = async () => {
+    if (!selectedPath || !user) return;
+    
+    setIsActivating(true);
+    try {
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        activeRoadmap: {
+          title: selectedPath.title,
+          pathId: selectedPath.id,
+          practiceSlug: selectedPath.practiceSlug
+        }
+      });
+      
+      toast({
+        title: "Roadmap Activated!",
+        description: `${selectedPath.title} is now your active path. Redirecting to modules...`
+      });
+      
+      setTimeout(() => {
+        router.push(`/practice/${selectedPath.practiceSlug}`);
+      }, 1000);
+    } catch (error) {
+      toast({
+        title: "Activation Failed",
+        description: "Could not sync roadmap to your profile. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsActivating(false);
+    }
+  };
 
   const filteredPaths = selectedDegree?.careerPaths.filter(path => 
     path.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -166,7 +205,20 @@ export default function RoadmapsPage() {
                     </div>
                   </div>
 
-                  <GlowButton className="w-full py-8 text-lg">Download Roadmap PDF</GlowButton>
+                  <div className="p-6 bg-primary/5 rounded-[2rem] border border-primary/20 space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Rocket className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-black uppercase tracking-tight">Active Learning</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground font-medium">Click below to bind this roadmap to your profile and unlock the training modules.</p>
+                    <GlowButton 
+                      onClick={handleStartLearning} 
+                      disabled={isActivating}
+                      className="w-full py-6 text-lg"
+                    >
+                      {isActivating ? <Loader2 className="w-5 h-5 animate-spin" /> : "START LEARNING"}
+                    </GlowButton>
+                  </div>
                 </div>
 
                 <div className="lg:col-span-8 space-y-8">

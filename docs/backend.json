@@ -32,6 +32,15 @@
           "enum": ["free", "premium"],
           "description": "The subscription level of the student."
         },
+        "activeRoadmap": {
+          "type": "object",
+          "properties": {
+            "title": { "type": "string" },
+            "pathId": { "type": "string" },
+            "practiceSlug": { "type": "string" }
+          },
+          "description": "The current industrial roadmap the student is following."
+        },
         "createdAt": {
           "type": "string",
           "format": "date-time"

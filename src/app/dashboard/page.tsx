@@ -3,21 +3,20 @@
 
 import { useUser, useFirestore, useCollection, useDoc, useMemoFirebase } from "@/firebase";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { GlowButton } from "@/components/GlowButton";
 import { 
   Trophy, 
-  Target, 
-  Clock, 
   BookOpen, 
   Zap, 
-  LineChart,
   ChevronRight,
   ShieldCheck,
   Loader2,
   Calendar,
   Activity,
-  Award
+  Award,
+  Rocket,
+  Map
 } from "lucide-react";
 import Link from "next/link";
 import { collection, orderBy, query, limit, doc } from "firebase/firestore";
@@ -113,9 +112,9 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Analytics Grid */}
+      {/* Active Roadmap & Performance Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <section className="lg:col-span-2 glass-card p-10 rounded-[3.5rem] space-y-10">
+        <section className="lg:col-span-2 glass-card p-10 rounded-[3.5rem] space-y-10 relative overflow-hidden">
            <div className="flex items-center justify-between">
               <h2 className="text-3xl font-black uppercase tracking-tight flex items-center gap-4">
                 <Activity className="w-8 h-8 text-primary" /> Mission Performance
@@ -144,40 +143,50 @@ export default function DashboardPage() {
            </div>
         </section>
 
-        <section className="glass-card p-10 rounded-[3.5rem] border-secondary/20 flex flex-col justify-between relative overflow-hidden group">
+        <section className="glass-card p-10 rounded-[3.5rem] border-primary/20 flex flex-col justify-between relative overflow-hidden group">
            <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:scale-125 transition-all">
-             <Award className="w-48 h-48 text-secondary" />
+             <Rocket className="w-48 h-48 text-primary" />
            </div>
            
            <div className="space-y-8 relative z-10">
-              <h3 className="text-2xl font-black uppercase tracking-tight text-secondary flex items-center gap-3">
-                <Trophy className="w-7 h-7" /> Top Efficiency
+              <h3 className="text-2xl font-black uppercase tracking-tight text-primary flex items-center gap-3">
+                <Map className="w-7 h-7" /> Active Roadmap
               </h3>
-              <div className="space-y-8">
-                 <div className="flex flex-col">
-                    <span className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em] mb-2">Average Precision</span>
-                    <span className="text-6xl font-black text-neon-cyan">
-                      {testAttempts && testAttempts.length > 0 
-                        ? (testAttempts.reduce((acc, curr) => acc + curr.accuracyPercentage, 0) / testAttempts.length).toFixed(1) + "%"
-                        : "0%"}
-                    </span>
-                 </div>
-                 <div className="space-y-4 pt-4 border-t border-white/5">
-                    <div className="flex items-center justify-between">
-                       <span className="text-[10px] font-black uppercase text-muted-foreground">Active Missions</span>
-                       <span className="text-xl font-black">{testAttempts?.length || 0}</span>
+              {userData?.activeRoadmap ? (
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">Current Goal</span>
+                    <div className="text-3xl font-black uppercase tracking-tighter leading-tight text-white">
+                      {userData.activeRoadmap.title}
                     </div>
-                    <div className="flex items-center justify-between">
-                       <span className="text-[10px] font-black uppercase text-muted-foreground">Learning Credits</span>
-                       <span className="text-xl font-black">12,450</span>
-                    </div>
-                 </div>
-              </div>
+                  </div>
+                  <div className="p-6 bg-primary/5 rounded-3xl border border-primary/20">
+                     <div className="flex items-center justify-between mb-4">
+                        <span className="text-[10px] font-black uppercase text-muted-foreground">Industrial Completion</span>
+                        <span className="text-sm font-black text-primary">{getProgress(userData.activeRoadmap.practiceSlug)}%</span>
+                     </div>
+                     <Progress value={getProgress(userData.activeRoadmap.practiceSlug)} className="h-2 bg-white/5" />
+                  </div>
+                  <Link href={`/practice/${userData.activeRoadmap.practiceSlug}`}>
+                    <GlowButton className="w-full py-7 text-lg">RESUME TRAINING</GlowButton>
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <p className="text-muted-foreground font-medium text-sm leading-relaxed">No active industrial path selected. Visit the Roadmap page to initialize your career sequence.</p>
+                  <Link href="/roadmaps">
+                    <GlowButton variant="outline" className="w-full py-7">BROWSE PATHS</GlowButton>
+                  </Link>
+                </div>
+              )}
            </div>
            
-           <Link href="/test" className="relative z-10 mt-8">
-             <GlowButton variant="secondary" className="w-full py-8 text-lg">Start New Mission</GlowButton>
-           </Link>
+           <div className="pt-8 border-t border-white/5 mt-auto">
+              <div className="flex items-center justify-between">
+                 <span className="text-[10px] font-black uppercase text-muted-foreground">Learning Credits</span>
+                 <span className="text-xl font-black text-secondary">12,450 XP</span>
+              </div>
+           </div>
         </section>
       </div>
 
@@ -186,22 +195,27 @@ export default function DashboardPage() {
         <section className="lg:col-span-8 glass-card p-10 rounded-[3.5rem] space-y-10">
            <div className="flex items-center justify-between">
               <h2 className="text-2xl font-black uppercase tracking-tight flex items-center gap-4">
-                <BookOpen className="w-7 h-7 text-primary" /> Industrial Roadmap Progress
+                <BookOpen className="w-7 h-7 text-primary" /> Industrial Core Progress
               </h2>
            </div>
            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {courses.map((course) => (
-                <div key={course.slug} className="p-8 bg-white/[0.02] rounded-[2.5rem] border border-white/5 space-y-6 hover:neon-border-cyan transition-all group">
-                   <div className="flex items-center justify-between">
+                <div key={course.slug} className={cn(
+                  "p-8 bg-white/[0.02] rounded-[2.5rem] border transition-all group",
+                  userData?.activeRoadmap?.practiceSlug === course.slug ? "border-primary/40 bg-primary/[0.03] neon-glow-cyan" : "border-white/5 hover:border-white/20"
+                )}>
+                   <div className="flex items-center justify-between mb-6">
                       <span className="font-black uppercase tracking-tighter text-xl">{course.name}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-black text-primary">{getProgress(course.slug)}%</span>
-                        <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                        {userData?.activeRoadmap?.practiceSlug === course.slug && <Rocket className="w-4 h-4 text-primary animate-bounce" />}
                       </div>
                    </div>
                    <Progress value={getProgress(course.slug)} className="h-2.5 bg-white/5" />
-                   <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                     <span className="text-[10px] font-black text-muted-foreground uppercase">Phase 1 Complete</span>
+                   <div className="flex items-center justify-between pt-4 border-t border-white/5 mt-4">
+                     <span className="text-[10px] font-black text-muted-foreground uppercase">
+                       {userData?.activeRoadmap?.practiceSlug === course.slug ? "ACTIVE PATH" : "Phase 1 Complete"}
+                     </span>
                      <Link href={`/practice/${course.slug}`} className="inline-flex items-center gap-2 text-[10px] font-black uppercase text-primary hover:gap-4 transition-all">
                         Deep Learn <ChevronRight className="w-3 h-3" />
                      </Link>
