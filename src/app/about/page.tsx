@@ -78,13 +78,15 @@ export default function AboutPage() {
             <div className="absolute -inset-4 bg-primary/20 blur-2xl group-hover:bg-primary/30 transition-all rounded-full" />
             <div className="relative aspect-square glass rounded-[3rem] overflow-hidden border-2 border-primary/20 p-4 flex items-center justify-center animate-float-3d">
                <div className="relative w-full h-full rounded-2xl overflow-hidden">
-                 <Image 
-                   src={founderImage?.imageUrl || ""} 
-                   alt="Somnath Podder" 
-                   fill 
-                   className="object-cover group-hover:scale-110 transition-transform duration-700"
-                   data-ai-hint={founderImage?.imageHint}
-                 />
+                 {founderImage?.imageUrl && (
+                   <Image 
+                     src={founderImage.imageUrl} 
+                     alt="Somnath Podder" 
+                     fill 
+                     className="object-cover group-hover:scale-110 transition-transform duration-700"
+                     data-ai-hint={founderImage.imageHint}
+                   />
+                 )}
                  <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
                </div>
             </div>
