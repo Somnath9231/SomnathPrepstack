@@ -1,15 +1,11 @@
 
 "use client";
 
-import { GraduationCap, Target, Users, Code2 } from "lucide-react";
+import { GraduationCap, Target, Users } from "lucide-react";
 import { GlowButton } from "@/components/GlowButton";
 import Link from "next/link";
-import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function AboutPage() {
-  const founderImage = PlaceHolderImages.find(img => img.id === 'founder-image');
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-24 space-y-24">
       {/* Hero Section */}
@@ -49,10 +45,9 @@ export default function AboutPage() {
       {/* Founder Section */}
       <section className="glass-card rounded-[4rem] p-12 lg:p-20 relative overflow-hidden border-white/5">
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[120px] pointer-events-none" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
+        <div className="max-w-3xl mx-auto space-y-8 text-center relative z-10">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border-primary/20 text-xs font-black text-primary uppercase tracking-widest">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border-primary/20 text-xs font-black text-primary uppercase tracking-widest mx-auto">
                 <GraduationCap className="w-4 h-4" /> The Architect
               </div>
               <h3 className="text-4xl md:text-5xl font-black uppercase tracking-tighter">Founder's Story</h3>
@@ -63,11 +58,11 @@ export default function AboutPage() {
             <div className="space-y-4">
               <div className="text-3xl font-black uppercase tracking-tight text-neon-cyan">Somnath Podder</div>
               <div className="text-xs text-muted-foreground uppercase tracking-[0.4em] font-black">Founder & Lead Developer</div>
-              <p className="text-muted-foreground font-medium leading-relaxed max-w-lg">
+              <p className="text-muted-foreground font-medium leading-relaxed mx-auto max-w-lg">
                 With a background in software engineering and a passion for industrial education, Somnath developed PrepStack to automate personalized guidance, making quality placement prep accessible to all students globally.
               </p>
             </div>
-            <div className="flex flex-wrap gap-4 pt-4">
+            <div className="flex flex-wrap gap-4 pt-4 justify-center">
                <Link href="/contact">
                 <GlowButton className="px-10 py-7">Contact Somnath</GlowButton>
                </Link>
@@ -75,29 +70,6 @@ export default function AboutPage() {
                 <GlowButton variant="outline" className="px-10 py-7">LinkedIn Profile</GlowButton>
                </a>
             </div>
-          </div>
-          <div className="relative group perspective-1000 hidden lg:block">
-            <div className="absolute -inset-4 bg-primary/20 blur-2xl group-hover:bg-primary/30 transition-all rounded-full" />
-            <div className="relative aspect-square glass rounded-[3rem] overflow-hidden border-2 border-primary/20 p-4 flex items-center justify-center animate-float-3d">
-               <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/20">
-                 {founderImage?.imageUrl ? (
-                   <Image 
-                     src={founderImage.imageUrl} 
-                     alt="Somnath Podder" 
-                     fill 
-                     className="object-cover group-hover:scale-110 transition-transform duration-700"
-                     priority
-                     data-ai-hint={founderImage.imageHint}
-                   />
-                 ) : (
-                   <div className="w-full h-full bg-primary/5 flex items-center justify-center text-primary/40 font-black uppercase tracking-widest text-[10px]">
-                     Initializing Protocol...
-                   </div>
-                 )}
-                 <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
-               </div>
-            </div>
-          </div>
         </div>
       </section>
     </div>
