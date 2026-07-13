@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { collection, orderBy, query, limit, doc } from "firebase/firestore";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 import { 
   AreaChart, 
   Area, 
@@ -99,7 +100,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex flex-wrap items-center gap-6 text-xs font-black text-muted-foreground uppercase tracking-widest">
              <span className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl"><ShieldCheck className="w-3.5 h-3.5 text-primary" /> UID: {userData?.customId || "SYNCING..."}</span>
-             <span className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl"><Calendar className="w-3.5 h-3.5" /> Initialized: {userData?.createdAt?.toDate()?.toLocaleDateString()}</span>
+             <span className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-xl"><Calendar className="w-3.5 h-3.5" /> Initialized: {userData?.createdAt?.toDate?.()?.toLocaleDateString()}</span>
           </div>
         </div>
         

@@ -101,7 +101,7 @@ export default function LoginPage() {
         </form>
 
         <div className="text-center pt-4">
-          <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">
+          <p className="text-sm text-muted-foreground font-bold uppercase tracking-widest">
             First time? <Link href="/signup" className="text-primary hover:underline ml-2">Initialize Protocol</Link>
           </p>
         </div>
